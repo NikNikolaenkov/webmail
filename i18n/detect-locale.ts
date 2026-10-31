@@ -3,6 +3,17 @@ import { matchSupportedLocale } from './locale-matcher';
 import { useLocaleStore } from '@/stores/locale-store';
 
 /**
+ * Fork (NikNikolaenkov/webmail): locales automatic detection may switch to.
+ * NEXT_PUBLIC_DETECT_LOCALES="uk,en" keeps a Russian browser on the default
+ * (Ukrainian) instead of switching to ru; empty means every supported locale.
+ */
+export function detectableLocales(raw: string | undefined = process.env.NEXT_PUBLIC_DETECT_LOCALES): readonly string[] {
+  const wanted = (raw ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  const picked = routing.locales.filter((l) => wanted.includes(l));
+  return picked.length > 0 ? picked : routing.locales;
+}
+
+/**
  * Pick the best supported locale for a first-time visitor from their browser
  * language preferences. Returns `fallback` (English default) when the browser
  * prefers English, prefers nothing we support, or is unavailable (SSR) — so we
@@ -10,12 +21,12 @@ import { useLocaleStore } from '@/stores/locale-store';
  * language we ship. A user's explicit choice is persisted separately and is
  * never overridden by this.
  */
-export function detectBrowserLocale(fallback: string): string {
+export function detectBrowserLocale(fallback: string, candidates: readonly string[] = detectableLocales()): string {
   if (typeof navigator === 'undefined') return fallback;
   const prefs = navigator.languages?.length ? navigator.languages : [navigator.language];
   for (const tag of prefs) {
     if (!tag) continue;
-    const locale = matchSupportedLocale(tag, routing.locales);
+    const locale = matchSupportedLocale(tag, candidates);
     if (locale === 'en') return fallback; // English is the top preference -> keep default
     if (locale) return locale;             // first supported non-English preference wins
   }

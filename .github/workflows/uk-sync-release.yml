@@ -107,9 +107,9 @@ jobs:
           CI: "true"
           GIT_COMMIT: ${{ github.sha }}
           LITE_TARGET: stalwart
-          LITE_LOCALES: uk,en
+          LITE_LOCALES: uk
           NEXT_PUBLIC_DEFAULT_LOCALE: uk
-          NEXT_PUBLIC_DETECT_LOCALES: uk,en
+          NEXT_PUBLIC_DETECT_LOCALES: uk
         run: npm run build:lite
 
       - name: Scan the bundle for outside hosts
@@ -122,7 +122,7 @@ jobs:
           unzip -l bulwark-lite-stalwart.zip | grep -q ' stalwart-app.json$'
           unzip -l bulwark-lite-stalwart.zip | grep -q ' index.html$'
           unzip -p bulwark-lite-stalwart.zip index.html > /tmp/index.html
-          grep -q 'var LOCALES = \["en","uk"\]' /tmp/index.html
+          grep -q 'var LOCALES = \["uk"\]' /tmp/index.html
           grep -q 'var FALLBACK = "uk"' /tmp/index.html
           sha256sum bulwark-lite-stalwart.zip > bulwark-lite-stalwart.zip.sha256
 

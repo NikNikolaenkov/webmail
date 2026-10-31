@@ -30,6 +30,13 @@ describe('detectBrowserLocale with a restricted set', () => {
     expect(detectBrowserLocale('uk', detectableLocales('uk,en'))).toBe('uk');
   });
 
+  it('keeps Ukrainian for every browser when only uk is detectable (fork build)', () => {
+    setLanguages(['en-US', 'en']);
+    expect(detectBrowserLocale('uk', detectableLocales('uk'))).toBe('uk');
+    setLanguages(['de-DE', 'ru-RU']);
+    expect(detectBrowserLocale('uk', detectableLocales('uk'))).toBe('uk');
+  });
+
   it('still auto-switches to Russian without a restriction (upstream behaviour)', () => {
     setLanguages(['ru-RU', 'ru']);
     expect(detectBrowserLocale('uk', detectableLocales(undefined))).toBe('ru');

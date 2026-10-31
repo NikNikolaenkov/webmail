@@ -12,7 +12,7 @@ Upstream: [bulwarkmail/webmail](https://github.com/bulwarkmail/webmail). License
 
 | File | Why |
 |---|---|
-| `i18n/detect-locale.ts` | `NEXT_PUBLIC_DETECT_LOCALES` limits automatic language detection; with `uk,en` a Russian browser stays on Ukrainian instead of switching to `ru` |
+| `i18n/detect-locale.ts` | `NEXT_PUBLIC_DETECT_LOCALES` limits automatic language detection; with `uk` every browser (ru, en, de…) opens in Ukrainian. Only the `uk` shell is built (`LITE_LOCALES=uk`); every other language stays selectable in Settings |
 | `i18n/__tests__/detect-locale.test.ts` | tests for the above |
 | `locales/uk/common.json` | missing and untranslated Ukrainian strings |
 | `scripts/i18n/uk-missing.mjs` | report: keys missing in `uk` and values identical to `en` |
@@ -26,7 +26,7 @@ Upstream workflows that publish images or release assets are disabled in this re
 Every night at 02:30 UTC `uk-sync-release.yml` merges upstream `main` into `uk`. On a merge conflict it opens an issue «Конфлікт злиття з апстрімом» and stops. Otherwise it runs the fork tests, reports the Ukrainian coverage (non-blocking), builds the Stalwart Lite bundle
 
 ```
-LITE_TARGET=stalwart LITE_LOCALES=uk,en NEXT_PUBLIC_DEFAULT_LOCALE=uk NEXT_PUBLIC_DETECT_LOCALES=uk,en npm run build:lite
+LITE_TARGET=stalwart LITE_LOCALES=uk NEXT_PUBLIC_DEFAULT_LOCALE=uk NEXT_PUBLIC_DETECT_LOCALES=uk npm run build:lite
 ```
 
 and publishes `bulwark-lite-stalwart.zip` as release `uk-v<version>-<run>` and as the rolling release `uk-latest`. The mail server downloads

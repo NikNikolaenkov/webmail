@@ -1,0 +1,153 @@
+name: "Fork: sync upstream and release uk"
+
+# NikNikolaenkov/webmail (see FORK.md). Every night: merge bulwarkmail/webmail
+# main into `uk`, build the Stalwart Lite bundle with Ukrainian as the default
+# locale and publish it as `uk-v<version>-<run>` and the rolling `uk-latest`,
+# which mail.servgc.space downloads. A merge conflict opens an issue instead.
+#
+# SYNC_TOKEN: fine-grained PAT on this repository (Contents RW, Workflows RW);
+# GITHUB_TOKEN cannot push upstream changes to .github/workflows.
+
+on:
+  schedule:
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: uk-sync-release
+  cancel-in-progress: false
+
+env:
+  UPSTREAM: https://github.com/bulwarkmail/webmail.git
+  CONFLICT_TITLE: "Конфлікт злиття з апстрімом"
+
+jobs:
+  sync-build-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check SYNC_TOKEN
+        env:
+          SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          if [ -z "$SYNC_TOKEN" ]; then
+            echo "::error::Секрет SYNC_TOKEN порожній або не заданий"; exit 1
+          fi
+          git ls-remote "https://x-access-token:${SYNC_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD >/dev/null \
+            || { echo "::error::SYNC_TOKEN не дає доступу до ${GITHUB_REPOSITORY}"; exit 1; }
+
+      - name: Checkout uk
+        uses: actions/checkout@v7
+        with:
+          ref: uk
+          fetch-depth: 0
+          token: ${{ secrets.SYNC_TOKEN }}
+
+      - name: Merge upstream main
+        id: merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "uk-sync[bot]"
+          git config user.email "uk-sync@users.noreply.github.com"
+          git remote add upstream "$UPSTREAM"
+          git fetch --no-tags upstream main
+          before=$(git rev-parse HEAD)
+          if ! git merge --no-edit upstream/main; then
+            git merge --abort || true
+            open=$(gh issue list --state open --search "\"$CONFLICT_TITLE\" in:title" --json number --jq length)
+            if [ "$open" = "0" ]; then
+              gh issue create --title "$CONFLICT_TITLE" \
+                --body "Нічна синхронізація не змогла злити \`upstream/main\` ($(git rev-parse --short upstream/main)) у \`uk\`. Злити вручну й розв'язати конфлікт; запуск: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            fi
+            echo "::error::Конфлікт злиття з апстрімом"; exit 1
+          fi
+          if [ "$(git rev-parse HEAD)" = "$before" ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Нових комітів апстріму немає — пропуск." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Setup Node.js
+        if: steps.merge.outputs.skip != 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.merge.outputs.skip != 'true'
+        run: npm ci
+
+      - name: Fork tests (locale detection)
+        if: steps.merge.outputs.skip != 'true'
+        run: npx vitest run i18n/__tests__/detect-locale.test.ts
+
+      - name: Translation tests (report only)
+        if: steps.merge.outputs.skip != 'true'
+        continue-on-error: true
+        run: npm run test:translations
+
+      - name: Ukrainian coverage report
+        if: steps.merge.outputs.skip != 'true'
+        run: |
+          {
+            echo '### Переклад uk'
+            echo '```'
+            node scripts/i18n/uk-missing.mjs | head -60
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build Stalwart bundle (uk default)
+        if: steps.merge.outputs.skip != 'true'
+        env:
+          CI: "true"
+          GIT_COMMIT: ${{ github.sha }}
+          LITE_TARGET: stalwart
+          LITE_LOCALES: uk,en
+          NEXT_PUBLIC_DEFAULT_LOCALE: uk
+          NEXT_PUBLIC_DETECT_LOCALES: uk,en
+        run: npm run build:lite
+
+      - name: Scan the bundle for outside hosts
+        if: steps.merge.outputs.skip != 'true'
+        run: node scripts/lite/scan-hosts.mjs out
+
+      - name: Check bundle
+        if: steps.merge.outputs.skip != 'true'
+        run: |
+          unzip -l bulwark-lite-stalwart.zip | grep -q ' stalwart-app.json$'
+          unzip -l bulwark-lite-stalwart.zip | grep -q ' index.html$'
+          unzip -p bulwark-lite-stalwart.zip index.html > /tmp/index.html
+          grep -q 'var LOCALES = \["en","uk"\]' /tmp/index.html
+          grep -q 'var FALLBACK = "uk"' /tmp/index.html
+          sha256sum bulwark-lite-stalwart.zip > bulwark-lite-stalwart.zip.sha256
+
+      - name: Push uk and mirror main
+        if: steps.merge.outputs.skip != 'true'
+        run: |
+          git push origin HEAD:uk
+          git push origin upstream/main:refs/heads/main
+
+      - name: Release
+        if: steps.merge.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(cat VERSION)
+          tag="uk-v${version}-${GITHUB_RUN_NUMBER}"
+          sha=$(git rev-parse HEAD)
+          gh release create "$tag" bulwark-lite-stalwart.zip bulwark-lite-stalwart.zip.sha256 \
+            --target "$sha" --title "$tag" \
+            --notes "Bulwark ${version} (апстрім $(git rev-parse --short upstream/main)), українська за замовчуванням. Коміт ${sha}."
+          if gh release view uk-latest >/dev/null 2>&1; then
+            gh release upload uk-latest bulwark-lite-stalwart.zip bulwark-lite-stalwart.zip.sha256 --clobber
+            gh release edit uk-latest --notes "Останній збірний бандл: ${tag}."
+          else
+            gh release create uk-latest bulwark-lite-stalwart.zip bulwark-lite-stalwart.zip.sha256 \
+              --target "$sha" --title "uk-latest" --notes "Останній збірний бандл: ${tag}." --latest=false
+          fi
+          echo "Реліз: ${tag}" >> "$GITHUB_STEP_SUMMARY"

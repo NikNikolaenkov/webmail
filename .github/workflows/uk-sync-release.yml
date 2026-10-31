@@ -24,6 +24,8 @@ concurrency:
 env:
   UPSTREAM: https://github.com/bulwarkmail/webmail.git
   CONFLICT_TITLE: "Конфлікт злиття з апстрімом"
+  # In a fork gh defaults to the parent repository; releases and issues belong here.
+  GH_REPO: ${{ github.repository }}
 
 jobs:
   sync-build-release:

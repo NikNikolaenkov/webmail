@@ -73,10 +73,10 @@
     "demo_tagline": "Спробуйте повнофункціональний поштовий клієнт. Обліковий запис не потрібен.",
     "demo_no_signup": "Реєстрація не потрібна - вільно досліджуйте з зразками даних",
     "mobile_handoff": {
-      "title": "Open the Bulwark mobile app?",
-      "description": "This sign-in page was opened by an app on this device. Your sign-in for {username} will be handed to the app that registered the Bulwark link. Continue only if you started this from the Bulwark mobile app.",
-      "confirm": "Hand over to the app",
-      "cancel": "Stay in the webmail"
+      "title": "Відкрити мобільний застосунок Bulwark?",
+      "description": "Цю сторінку входу відкрив застосунок на цьому пристрої. Вхід для {username} буде передано застосунку, який зареєстрував посилання Bulwark. Продовжуйте, лише якщо ви почали вхід у мобільному застосунку Bulwark.",
+      "confirm": "Передати застосунку",
+      "cancel": "Лишитися у вебпошті"
     },
     "oauth_completing": "Завершення входу...",
     "oauth_error": {
@@ -98,7 +98,7 @@
     "sign_out_now": "Вийти зараз",
     "max_title": "Ваш сеанс завершується",
     "max_message": "Ваша організація завершує сеанси через {hours, plural, one {# годину} few {# години} many {# годин} other {# години}} після входу. Вас буде виведено із системи через {seconds, plural, one {# секунду} few {# секунди} many {# секунд} other {# секунди}}. Відкриті листи зберігаються як чернетки.",
-    "dismiss": "OK",
+    "dismiss": "Гаразд",
     "signing_out": "Збереження чернеток і вихід…",
     "reason_idle": "Вас виведено із системи після {minutes, plural, one {# хвилини} few {# хвилин} many {# хвилин} other {# хвилини}} без активності.",
     "reason_max": "Вас виведено із системи, бо сеанс досяг максимальної тривалості: {hours, plural, one {# година} few {# години} many {# годин} other {# години}}.",
@@ -200,9 +200,9 @@
     "unified_all_unread": "Усі непрочитані",
     "unified_all_starred": "Усі позначені",
     "unified_all_mail": "Уся пошта",
-    "remove_account": "Remove account",
+    "remove_account": "Видалити обліковий запис",
     "remove_account_title": "Вилучити обліковий запис?",
-    "remove_account_confirm": "Remove {account} from this device? You can add it back later.",
+    "remove_account_confirm": "Видалити {account} з цього пристрою? Пізніше його можна додати знову.",
     "labels": "Мітки",
     "create_label": "Створити мітку",
     "mv_tasks": "Завдання",
@@ -256,7 +256,7 @@
     "name_label": "Ім'я",
     "name_placeholder": "Мій додаток",
     "name_required": "Необхідно вказати ім'я",
-    "url_label": "URL",
+    "url_label": "URL-адреса",
     "url_required": "Необхідна URL-адреса",
     "url_invalid": "Введіть дійсну URL-адресу http або https",
     "icon_label": "значок",
@@ -445,7 +445,7 @@
     "forward": "Переслати",
     "delete": "Видалити",
     "archive": "Архів",
-    "archive_mailbox_not_found": "Archive mailbox not found - cannot archive email",
+    "archive_mailbox_not_found": "Теку архіву не знайдено — лист неможливо заархівувати",
     "star": "зірка",
     "unstar": "Зняти зірочку",
     "mark_unread": "Позначити як непрочитане",
@@ -479,8 +479,8 @@
     "download_all_partial": "{count, plural, one {# вкладення не включено до ZIP-архіву.} few {# вкладення не включено до ZIP-архіву.} many {# вкладень не включено до ZIP-архіву.} other {# вкладення не включено до ZIP-архіву.}}",
     "from": "Від",
     "to": "до",
-    "cc": "CC",
-    "bcc": "BCC",
+    "cc": "Копія",
+    "bcc": "Прихована копія",
     "date": "Дата",
     "subject": "Тема",
     "show_details": "Показати деталі",
@@ -895,15 +895,15 @@
     "forward_message": "Переслати",
     "from": "Від",
     "to": "до",
-    "cc": "CC",
-    "bcc": "BCC",
+    "cc": "Копія",
+    "bcc": "Прихована копія",
     "subject": "Тема",
     "body_placeholder": "Напишіть своє повідомлення...",
     "send": "Надіслати",
     "cancel": "Скасувати",
     "attach": "Прикріпити",
-    "attach_photos": "Photos & Videos",
-    "attach_files": "Files",
+    "attach_photos": "Фото й відео",
+    "attach_files": "Файли",
     "attach_from_files": "Прикріпити з Файлів",
     "files_picker": {
       "attach": "{count, plural, =0 {Прикріпити} one {Прикріпити # файл} few {Прикріпити # файли} many {Прикріпити # файлів} other {Прикріпити # файлу}}",
@@ -925,7 +925,7 @@
     "cc_label": "Копія:",
     "bcc_label": "Прихована копія:",
     "subject_label": "Тема:",
-    "file_size_kb": "KB",
+    "file_size_kb": "КБ",
     "prefix": {
       "forward": "Fwd:",
       "reply": "Re:"
@@ -1029,9 +1029,28 @@
       "back": "Назад до редагування"
     },
     "placeholder_words": {
-      "before": ["ваше", "ваш", "ваша", "ваші", "твоє", "твій", "твоя", "вставте", "вкажіть", "введіть", "додайте"],
+      "before": [
+        "ваше",
+        "ваш",
+        "ваша",
+        "ваші",
+        "твоє",
+        "твій",
+        "твоя",
+        "вставте",
+        "вкажіть",
+        "введіть",
+        "додайте"
+      ],
       "after": [],
-      "unfinished": []
+      "unfinished": [
+        "TODO",
+        "TBD",
+        "TBA",
+        "TBC",
+        "FIXME",
+        "XXX"
+      ]
     },
     "add_link": "Додати посилання",
     "link_url_prompt": "Введіть URL",
@@ -1505,8 +1524,8 @@
         "label": "Спільна поштова скринька",
         "description": "Показувати об'єднані папки (Вхідні, Надіслані тощо) для всіх підключених облікових записів",
         "cross_account": {
-          "label": "Across all accounts",
-          "description": "Merge the unified mailbox across every connected account instead of staying within the active account."
+          "label": "Для всіх облікових записів",
+          "description": "Об'єднувати спільні вхідні з усіх підключених облікових записів, а не лише з активного."
         },
         "include_group": {
           "label": "Включати групові скриньки",
@@ -1516,8 +1535,8 @@
       "all_mail": {
         "folders_label": "Folders in All Mail",
         "folders_description": "Choose which folders are merged into the All Mail view.",
-        "account_hint": "Applies to {account}.",
-        "no_folders": "No folders available."
+        "account_hint": "Стосується {account}.",
+        "no_folders": "Немає доступних тек."
       },
       "colorful_sidebar_icons": {
         "label": "Кольорові значки бічної панелі",
@@ -1525,7 +1544,7 @@
       },
       "tint_list_rows": {
         "label": "Tint List Rows by Tag Color",
-        "description": "Shade each message row with its first tag color. Disable to keep rows plain; tag dots and chips still show the color."
+        "description": "Підфарбовувати рядок листа кольором його першої мітки. Вимкніть, щоб рядки були без фону; кольорові крапки й мітки лишаться."
       },
       "show_folder_total_count": {
         "label": "Показувати загальну кількість повідомлень",
@@ -1637,17 +1656,17 @@
         "relax": "Розслабтеся"
       },
       "push_all": {
-          "title": "All accounts",
-          "description": "Turn push on or off for several accounts at once. One browser subscription serves them all.",
-          "select_all": "Select every connected account",
-          "state_on": "notifications on",
-          "state_off": "notifications off",
-          "enable_selected": "Enable for selected",
-          "disable_selected": "Disable for selected",
-          "result_enabled": "Notifications enabled for {count} accounts.",
-          "result_partial": "Enabled for {enabled} accounts; {failed} could not be enabled.",
-          "result_disabled": "Notifications disabled for {count} accounts."
-        },
+        "title": "Усі облікові записи",
+        "description": "Увімкнути чи вимкнути push-сповіщення одразу для кількох облікових записів. Одна підписка браузера обслуговує їх усі.",
+        "select_all": "Вибрати всі підключені облікові записи",
+        "state_on": "сповіщення ввімкнено",
+        "state_off": "сповіщення вимкнено",
+        "enable_selected": "Увімкнути для вибраних",
+        "disable_selected": "Вимкнути для вибраних",
+        "result_enabled": "Сповіщення ввімкнено для облікових записів: {count}.",
+        "result_partial": "Увімкнено для облікових записів: {enabled}; не вдалося ввімкнути: {failed}.",
+        "result_disabled": "Сповіщення вимкнено для облікових записів: {count}."
+      },
       "sound_selection": {
         "title": "Звук сповіщення",
         "description": "Виберіть звук для сповіщень",
@@ -1661,8 +1680,8 @@
         "enabled_desc": "Показувати сповіщення про надходження нових електронних листів",
         "sound": "Звук сповіщення",
         "sound_desc": "Відтворення звукового сповіщення про надходження нових електронних листів",
-        "inbox_only": "Inbox only",
-        "inbox_only_desc": "Only notify for mail that lands in the Inbox; skip mail a filter files into another folder"
+        "inbox_only": "Лише «Вхідні»",
+        "inbox_only_desc": "Сповіщати лише про листи, що потрапили у «Вхідні»; не сповіщати про листи, які фільтр переклав в іншу теку"
       },
       "calendar": {
         "title": "Сповіщення календаря",
@@ -1689,7 +1708,7 @@
         "status_busy": "Виконується…",
         "status_inactive": "Не ввімкнено на цьому пристрої",
         "status_unsupported": "Цей браузер не підтримує Web Push",
-        "status_lite": "Web Push is not available in Bulwark Lite; it needs the Bulwark server.",
+        "status_lite": "Push-сповіщення недоступні в Bulwark Lite: для них потрібен сервер Bulwark.",
         "title": "Фонові сповіщення",
         "devices_title": "Зареєстровані пристрої",
         "devices_desc": "Усі пристрої, зареєстровані для отримання фонових сповіщень цього облікового запису. Після відкликання пристрій одразу перестає їх отримувати.",
@@ -1732,12 +1751,12 @@
         "preview_older": "Старіше:"
       },
       "date_locale": {
-        "label": "Date format region",
-        "description": "How numeric dates are ordered (day, month, year)",
-        "auto": "Automatic",
+        "label": "Формат дати",
+        "description": "Порядок дня, місяця й року в числових датах",
+        "auto": "Автоматично",
         "iso": "ISO 8601",
-        "dmy": "Day/Month/Year",
-        "mdy": "Month/Day/Year"
+        "dmy": "День/Місяць/Рік",
+        "mdy": "Місяць/День/Рік"
       },
       "time_format": {
         "label": "Формат часу",
@@ -1752,10 +1771,10 @@
         "monday": "понеділок"
       },
       "time_zone": {
-        "label": "Time zone",
-        "description": "Show email and calendar times in this time zone instead of the one reported by your browser",
-        "auto": "Automatic ({zone})",
-        "preview_now": "Now:"
+        "label": "Часовий пояс",
+        "description": "Показувати час листів і подій календаря в цьому поясі, а не в тому, що повідомляє браузер",
+        "auto": "Автоматично ({zone})",
+        "preview_now": "Зараз:"
       }
     },
     "email_behavior": {
@@ -2087,42 +2106,42 @@
         "add": "Додати обліковий запис"
       },
       "backup": {
-        "title": "Account list backup",
-        "description": "Keep the list of accounts in this browser on the server, encrypted with a password only you know, and bring it back on another device. Mailbox passwords are not saved: you sign in to each restored account yourself.",
-        "description_passwords": "Keep the list of accounts in this browser on the server, encrypted with a password only you know, and bring it back on another device. You can include the mailbox passwords, so the restored accounts sign in by themselves.",
-        "status_none": "No list is saved for {account}.",
-        "status_saved": "A list is saved for {account}.",
-        "save": "Save list",
-        "restore": "Restore list",
-        "delete": "Delete saved list",
-        "cancel": "Cancel",
-        "delete_confirm": "Delete the saved account list from the server?",
+        "title": "Резервна копія списку облікових записів",
+        "description": "Зберігайте список облікових записів цього браузера на сервері, зашифрований паролем, який знаєте лише ви, і відновлюйте його на іншому пристрої. Паролі скриньок не зберігаються: у кожен відновлений обліковий запис ви входите самі.",
+        "description_passwords": "Зберігайте список облікових записів цього браузера на сервері, зашифрований паролем, який знаєте лише ви, і відновлюйте його на іншому пристрої. Можна додати паролі скриньок — тоді відновлені облікові записи ввійдуть самі.",
+        "status_none": "Для {account} список не збережено.",
+        "status_saved": "Для {account} список збережено.",
+        "save": "Зберегти список",
+        "restore": "Відновити список",
+        "delete": "Видалити збережений список",
+        "cancel": "Скасувати",
+        "delete_confirm": "Видалити збережений список облікових записів із сервера?",
         "delete_message": "Інші пристрої більше не зможуть відновити з нього облікові записи.",
-        "password": "Backup password",
-        "password_hint": "At least 10 characters. It cannot be recovered: if you forget it, save the list again with a new one.",
-        "restore_hint": "The password chosen when the list was saved.",
-        "confirm": "Confirm password",
-        "include_passwords": "Include mailbox passwords",
-        "include_passwords_hint": "Accounts signed in here with a password will sign in by themselves after a restore. Anyone who knows the backup password gets into every mailbox in the list.",
-        "saved": "List saved ({count, plural, one {# account} other {# accounts}}).",
-        "restored": "Accounts added: {added}. Accounts already here and updated: {updated}. Open each new account from the account list to sign in.",
-        "restored_signed_in": "Accounts added: {added}. Accounts already here and updated: {updated}.",
-        "skipped": "{count, plural, one {# account was} other {# accounts were}} not added: the account limit is reached.",
-        "saved_passwords": "Passwords included for {count, plural, one {# account} other {# accounts}}.",
-        "signed_in": "Signed in to {count, plural, one {# account} other {# accounts}} with the saved password.",
-        "sign_in_failed": "{count, plural, one {# saved password was} other {# saved passwords were}} refused: sign in to those accounts from the account list.",
-        "deleted": "Saved list deleted.",
-        "prompt_title": "Restore your other accounts?",
-        "prompt_description": "A list of accounts is saved for {account}. Enter its backup password to add them to this browser, or do it later from Settings.",
-        "prompt_not_now": "Not now",
-        "prompt_done": "Done",
+        "password": "Пароль резервної копії",
+        "password_hint": "Щонайменше 10 символів. Його неможливо відновити: якщо забудете, збережіть список ще раз із новим паролем.",
+        "restore_hint": "Пароль, заданий під час збереження списку.",
+        "confirm": "Підтвердьте пароль",
+        "include_passwords": "Додати паролі скриньок",
+        "include_passwords_hint": "Облікові записи, у які тут увійшли з паролем, після відновлення ввійдуть самі. Кожен, хто знає пароль резервної копії, отримає доступ до всіх скриньок зі списку.",
+        "saved": "Список збережено ({count, plural, one {# обліковий запис} few {# облікові записи} many {# облікових записів} other {# облікового запису}}).",
+        "restored": "Додано облікових записів: {added}. Оновлено наявних: {updated}. Відкрийте кожен новий обліковий запис зі списку облікових записів, щоб увійти.",
+        "restored_signed_in": "Додано облікових записів: {added}. Оновлено наявних: {updated}.",
+        "skipped": "{count, plural, one {# обліковий запис не додано} few {# облікові записи не додано} many {# облікових записів не додано} other {# облікового запису не додано}}: досягнуто ліміту облікових записів.",
+        "saved_passwords": "Паролі додано для {count, plural, one {# облікового запису} other {# облікових записів}}.",
+        "signed_in": "Вхід за збереженим паролем виконано в {count, plural, one {# обліковий запис} few {# облікові записи} many {# облікових записів} other {# облікового запису}}.",
+        "sign_in_failed": "{count, plural, one {# збережений пароль відхилено} few {# збережені паролі відхилено} many {# збережених паролів відхилено} other {# збереженого пароля відхилено}}: увійдіть у ці облікові записи зі списку облікових записів.",
+        "deleted": "Збережений список видалено.",
+        "prompt_title": "Відновити інші облікові записи?",
+        "prompt_description": "Для {account} збережено список облікових записів. Введіть пароль резервної копії, щоб додати їх у цей браузер, або зробіть це пізніше в налаштуваннях.",
+        "prompt_not_now": "Не зараз",
+        "prompt_done": "Готово",
         "errors": {
-          "mismatch": "The passwords do not match.",
-          "password_length": "Use at least 10 characters.",
-          "unlock_failed": "Wrong password, or the list was saved for another account.",
-          "owner_signin_required": "Sign in to this account again, then retry.",
-          "https_required": "This needs a secure (HTTPS) connection.",
-          "storage_failed": "The server could not read or store the list. Try again later."
+          "mismatch": "Паролі не збігаються.",
+          "password_length": "Щонайменше 10 символів.",
+          "unlock_failed": "Неправильний пароль, або список збережено для іншого облікового запису.",
+          "owner_signin_required": "Увійдіть у цей обліковий запис ще раз і повторіть.",
+          "https_required": "Потрібне захищене з'єднання (HTTPS).",
+          "storage_failed": "Сервер не зміг прочитати чи зберегти список. Спробуйте пізніше."
         }
       },
       "shared_accounts": {
@@ -2401,8 +2420,8 @@
       "role_trash": "сміття",
       "role_junk": "Спам/сміття",
       "role_archive": "Архів",
-      "role_scheduled": "Scheduled",
-      "role_snoozed": "Snoozed",
+      "role_scheduled": "Заплановані",
+      "role_snoozed": "Відкладені",
       "role_none": "Жодного",
       "create_folder": "Створити папку",
       "create_subfolder": "Створити вкладену папку",
@@ -2497,9 +2516,9 @@
         "button": "Перегляд ярликів"
       },
       "refresh_cache": {
-        "label": "Refresh cached data",
-        "description": "Reload contacts, calendars, and folders from the server. Keeps your accounts and sessions — fixes a stale or wrong view without signing out.",
-        "button": "Refresh",
+        "label": "Оновити кешовані дані",
+        "description": "Заново завантажити контакти, календарі й теки із сервера. Облікові записи й сеанси лишаються — виправляє застарілий чи неправильний вигляд без виходу.",
+        "button": "Оновити",
         "confirm_title": "Оновити кешовані дані?"
       },
       "reset_settings": {
@@ -2677,7 +2696,7 @@
         "attachment": "Вкладення",
         "from": "Від",
         "to": "до",
-        "cc": "Cc",
+        "cc": "Копія",
         "subject": "Тема",
         "header": "Спеціальний заголовок",
         "size": "Розмір",
@@ -3524,7 +3543,7 @@
       "manage": "Керувати правилами",
       "senders_count": "{count, plural, one {# відправника} few {# відправників} many {# відправників} other {# відправника}}",
       "cross_account": "Виберіть листи з одного облікового запису",
-      "opaque_hint": "Ваші фільтри відредаговано вручну. Відкрийте налаштування фільтрів",
+      "opaque_hint": "Ваші фільтри відредаговано вручну. Відкрийте налаштування фільтрів",
       "loading": "Завантаження правил…",
       "load_failed": "Не вдалося завантажити правила",
       "none": "Правил поки немає",
@@ -3663,7 +3682,7 @@
     "no_identities": "Особи не знайдено",
     "display": {
       "reply_to": "Відповідь:",
-      "bcc": "BCC:",
+      "bcc": "Прихована копія:",
       "signature": "Підпис:",
       "preview": "Попередній перегляд:"
     },
@@ -3975,18 +3994,18 @@
       "calendar_uri": "URL-адреса календаря",
       "scheduling_uri": "URL-адреса планування",
       "freebusy_uri": "Вільний/зайнятий URL",
-      "section_contact": "Contact details",
-      "section_work": "Work",
-      "section_personal": "Personal",
-      "email_default_label": "Email",
-      "phone_default_label": "Phone",
-      "address_default_label": "Address",
+      "section_contact": "Контактні дані",
+      "section_work": "Робота",
+      "section_personal": "Особисте",
+      "email_default_label": "Ел. пошта",
+      "phone_default_label": "Телефон",
+      "address_default_label": "Адреса",
       "online_service_default_label": "Online",
-      "organization_label": "Organization",
-      "title_label": "Title",
-      "role_label": "Role",
-      "language_label": "Language",
-      "related_default_label": "Related",
+      "organization_label": "Організація",
+      "title_label": "Посада",
+      "role_label": "Роль",
+      "language_label": "Мова",
+      "related_default_label": "Пов'язана особа",
       "more_actions": "Більше дій",
       "age_years": "{count, plural, one {# рік} few {# роки} many {# років} other {# років}}",
       "years_since": "{count, plural, one {# рік тому} few {# роки тому} many {# років тому} other {# років тому}}"
@@ -3994,13 +4013,13 @@
     "activity": {
       "recent_emails": "Recent Emails",
       "upcoming_events": "Upcoming Events",
-      "no_emails": "No recent emails",
-      "no_events": "No upcoming events",
-      "no_subject": "(No subject)",
-      "no_title": "(No title)",
+      "no_emails": "Немає нещодавніх листів",
+      "no_events": "Немає найближчих подій",
+      "no_subject": "(Без теми)",
+      "no_title": "(Без назви)",
       "load_failed": "Failed to load",
-      "unknown_sender": "Unknown sender",
-      "all_day": "All day"
+      "unknown_sender": "Невідомий відправник",
+      "all_day": "Увесь день"
     },
     "form": {
       "create_title": "Новий контакт",
@@ -4024,7 +4043,7 @@
       "email": "Електронна пошта",
       "email_placeholder": "email@example.com",
       "phone": "Телефон",
-      "phone_placeholder": "+1 234 567 890",
+      "phone_placeholder": "+380 44 123 45 67",
       "phone_type": "Тип",
       "phone_voice": "Голос",
       "phone_cell": "мобільний",
@@ -4136,10 +4155,10 @@
       "no_members": "У цій групі немає учасників",
       "member_count": "{count, plural, =0 {Немає учасників} one {1 учасник} few {# учасники} many {# учасників} other {# учасників}}",
       "send_email": "Надіслати лист",
-      "send_email_to": "To",
+      "send_email_to": "Кому",
       "send_email_cc": "Cc",
       "send_email_bcc": "Bcc",
-      "no_member_emails": "This group has no members with an email address."
+      "no_member_emails": "У цій групі немає учасників з адресою ел. пошти."
     },
     "import": {
       "title": "Імпортувати контакти",
@@ -4588,7 +4607,7 @@
     "import": {
       "title": "Імпорт календаря",
       "tab_file": "Файл",
-      "tab_url": "URL",
+      "tab_url": "URL-адреса",
       "select_file": "Виберіть файл .ics",
       "drop_file": "або перетягніть файл сюди",
       "supported_formats": "Підтримує файли iCalendar (.ics).",
@@ -5020,10 +5039,10 @@
     "duplicate": "дублікат",
     "duplicate_success": "Продубльовано успішно",
     "duplicate_error": "Не вдалося скопіювати",
-    "share": "Share",
-    "shared": "Shared",
-    "shared_with_me": "Shared with me",
-    "shared_by": "Shared by {name}",
+    "share": "Поділитися",
+    "shared": "Спільні",
+    "shared_with_me": "Надані мені",
+    "shared_by": "Надав(-ла) {name}",
     "shared_files_from": "Файли від {name}",
     "create_file_success": "Файл створено",
     "create_file_error": "Не вдалося створити файл",
@@ -5774,7 +5793,7 @@
     },
     "dialog": {
       "from_plugin": "Від плагіна {name}",
-      "ok": "OK",
+      "ok": "Гаразд",
       "submit": "Надіслати",
       "confirm": "Підтвердити",
       "cancel": "Скасувати",
@@ -5823,7 +5842,7 @@
     "account_error": "Не вдалося виконати пошук у {account}",
     "recent_searches": "Останні запити",
     "recurring": "Повторювана",
-    "no_subject": "(no subject)",
+    "no_subject": "(без теми)",
     "empty_hint": "Шукайте пошту, контакти, події та файли в усіх облікових записах. Спробуйте from:, subject:, has:attachment, after:2026-01-01.",
     "flat_by_date": "Списком за датою",
     "grouped": "За групами",

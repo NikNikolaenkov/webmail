@@ -1,5 +1,5 @@
 {
-  "meta_description": "使用 JMAP 协议的极简网页邮件客户端",
+  "meta_description": "基于 JMAP 的自托管网页邮件，集邮件、日历、联系人和文件于一体",
   "login": {
     "title": "网页邮箱",
     "username_label": "邮箱地址",
@@ -473,6 +473,9 @@
     "source_truncated": "仅显示前 {size}。导出邮件可查看其余部分。",
     "source_copied": "源码已复制到剪贴板",
     "attachments": "附件",
+    "attachments_count": "{count, plural, other {# 个附件}}",
+    "attachments_show_more": "再显示 {count} 个",
+    "attachments_show_fewer": "收起",
     "important": "重要",
     "download": "下载",
     "download_all": "全部下载",
@@ -1503,7 +1506,7 @@
       },
       "unified_mailbox": {
         "label": "统一邮箱",
-        "description": "显示所有已连接账户的合并文件夹（收件箱、已发送等）",
+        "description": "显示当前账户及其共享文件夹的合并文件夹（收件箱、已发送等）。只有在有内容可合并时才会显示此部分：开启跨所有账户合并且连接了多个账户、在下方包含群组收件箱，或开启全部邮件、未读或加星标。这三项是单独的选项，需由管理员开启后才会出现。",
         "cross_account": {
           "label": "Across all accounts",
           "description": "Merge the unified mailbox across every connected account instead of staying within the active account."
@@ -1538,6 +1541,10 @@
       "show_shared_mail_accounts": {
         "label": "显示共享邮件账户",
         "description": "在侧边栏的“共享”下显示与你共享的邮箱的文件夹。关闭可全部隐藏，也可以在下方逐个隐藏账户。它们的日历和联系人仍会显示。"
+      },
+      "compact_shared_mailboxes": {
+        "label": "紧凑显示共享邮箱",
+        "description": "将每个共享邮箱显示为一行，点击即打开其收件箱，文件夹列在下方。草稿、已删除等空文件夹不显示。"
       },
       "pro_interface": {
         "label": "Pro 界面（实验性）",
@@ -1896,8 +1903,8 @@
       "attachment_position": {
         "label": "附件位置",
         "description": "在邮件标题中的何处显示附件",
-        "beside-sender": "发件人旁",
-        "below-header": "标题下方"
+        "below-header": "标题下方",
+        "below-message": "邮件下方的卡片"
       },
       "emails_per_page": {
         "10": "10 封邮件",
@@ -2582,7 +2589,9 @@
       "group_by_letter_description": "在联系人列表中显示按字母顺序排列的分节标题",
       "group_by_letter_label": "按首字母分组",
       "sort_by_last_name_label": "按姓氏排序",
-      "sort_by_last_name_description": "按姓氏排列联系人列表，使家庭成员显示在一起"
+      "sort_by_last_name_description": "按姓氏排列联系人列表，使家庭成员显示在一起",
+      "show_directory_label": "显示通讯录目录",
+      "show_directory_description": "在联系人的“通讯录目录”中列出邮件服务器上的账户和群组"
     },
     "calendar_management": {
       "delete_title": "删除日历?",
@@ -2673,6 +2682,7 @@
       "include_spam": "同时移动被标记为垃圾邮件的邮件",
       "attachment_type_placeholder": "例如：pdf、doc、jpg",
       "value_placeholder_multi": "值（多个用逗号分隔）",
+      "regex_placeholder": "正则表达式，例如 ^Cron|mailman",
       "condition_fields": {
         "attachment": "附件",
         "from": "发件人",
@@ -2694,6 +2704,7 @@
         "starts_with": "以…开头",
         "ends_with": "以…结尾",
         "matches": "匹配模式",
+        "regex": "匹配正则表达式",
         "greater_than": "大于",
         "less_than": "小于",
         "address_is": "地址为",
@@ -2756,6 +2767,7 @@
       "validation_action_forward": "请输入要转发到的地址",
       "validation_action_reject": "请输入拒收消息",
       "validation_header_name": "标头名称只能包含字母 A-Z、数字、连字符和下划线",
+      "validation_regex": "此正则表达式无效",
       "templates_section": "从模板开始",
       "template_newsletters": "将订阅邮件移至文件夹",
       "template_receipts": "自动归档收据",
@@ -3353,7 +3365,7 @@
       "row_url_required": "服务器 {index}：URL 为必填项",
       "row_url_scheme": "服务器 {index}：URL 必须以 http:// 或 https:// 开头",
       "stalwart": "启用 Stalwart 专属功能",
-      "stalwart_hint": "添加修改密码和 Sieve 过滤器管理。在其他服务器上启用也没有问题。"
+      "stalwart_hint": "添加“安全”页面（密码、双重验证和应用专用密码）以及恢复已删除项目。在其他服务器上启用也没有问题。"
     },
     "auth": {
       "title": "认证",
@@ -4498,6 +4510,11 @@
       "show_time_in_month_view_desc": "在月历视图中显示事件时间",
       "tinted_events": "浅色日程颜色",
       "tinted_events_desc": "像 Outlook 和打印件那样，用日历颜色的浅色调加开头的彩色竖条显示日程，而不是实心色块。",
+      "month_timed_events": "月视图中的定时事件",
+      "month_timed_events_desc": "有开始时间的事件在月视图中的显示方式。全天和多天事件仍显示为色条。",
+      "month_timed_events_bar": "色条",
+      "month_timed_events_text": "彩色文字",
+      "month_timed_events_dot": "圆点和文字",
       "show_week_numbers": "显示周数",
       "show_week_numbers_desc": "在迷你日历中显示周数",
       "calendar_free_scroll": "自由滚动",
@@ -5042,7 +5059,6 @@
     "settings_ascending": "升序",
     "settings_descending": "降序",
     "disabled_title": "文件功能已被您的管理员禁用",
-    "disabled_description": "通过 WebDAV 上传大文件可能导致 Stalwart/RocksDB 不稳定，包括内存溢出、崩溃以及难以回收的磁盘占用。已删除文件也可能不会立即从 blob 存储中清除。不建议在生产环境中启用此功能。",
     "no_accounts": "没有已连接的账户。",
     "open_folder_tree": "打开文件夹树",
     "migration_title": "正在更新您的文件…",
@@ -5396,7 +5412,7 @@
   },
   "pwa_install": {
     "title": "安装 {appName}",
-    "description": "安装我们的应用，以获得快速访问和离线支持。",
+    "description": "安装我们的应用，以获得快速访问。",
     "not_now": "暂不",
     "install": "安装",
     "dont_remind": "不再提醒",

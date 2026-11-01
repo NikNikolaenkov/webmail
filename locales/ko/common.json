@@ -1,5 +1,5 @@
 {
-  "meta_description": "JMAP 프로토콜을 사용하는 미니멀한 웹메일 클라이언트",
+  "meta_description": "메일, 캘린더, 연락처, 파일을 한곳에서 다루는 JMAP 기반 셀프 호스팅 웹메일",
   "login": {
     "title": "웹메일",
     "username_label": "이메일",
@@ -473,6 +473,9 @@
     "source_truncated": "처음 {size}만 표시해요. 나머지는 메시지를 내보내세요.",
     "source_copied": "원본이 클립보드에 복사되었어요",
     "attachments": "첨부파일",
+    "attachments_count": "{count, plural, other {첨부파일 #개}}",
+    "attachments_show_more": "{count}개 더 보기",
+    "attachments_show_fewer": "간략히 보기",
     "important": "중요",
     "download": "다운로드",
     "download_all": "모두 다운로드",
@@ -1503,7 +1506,7 @@
       },
       "unified_mailbox": {
         "label": "통합 메일함",
-        "description": "연결된 모든 계정의 통합 폴더(받은편지함, 보낸편지함 등)를 표시합니다",
+        "description": "활성 계정과 공유 폴더의 통합 폴더(받은편지함, 보낸편지함 등)를 표시합니다. 이 섹션은 합칠 내용이 있을 때만 나타나요. 모든 계정 통합이 켜져 있고 계정이 둘 이상 연결된 경우, 아래에서 그룹 받은편지함을 포함한 경우, 또는 모든 메일·읽지 않음·별표 중 하나가 켜진 경우예요. 이 세 가지는 별도 옵션이며 관리자가 켜야 표시돼요.",
         "cross_account": {
           "label": "Across all accounts",
           "description": "Merge the unified mailbox across every connected account instead of staying within the active account."
@@ -1538,6 +1541,10 @@
       "show_shared_mail_accounts": {
         "label": "공유 메일 계정 표시",
         "description": "나와 공유된 메일함의 폴더를 사이드바의 '공유됨' 아래에 표시합니다. 끄면 모두 숨겨지며, 아래에서 계정별로 숨길 수도 있습니다. 캘린더와 연락처는 그대로 유지됩니다."
+      },
+      "compact_shared_mailboxes": {
+        "label": "공유 메일함 간단히 보기",
+        "description": "각 공유 메일함을 받은편지함을 여는 한 줄로 표시하고, 그 아래에 폴더를 표시합니다. 임시보관함이나 휴지통 같은 빈 폴더는 숨깁니다."
       },
       "pro_interface": {
         "label": "Pro 인터페이스 (실험적)",
@@ -1896,8 +1903,8 @@
       "attachment_position": {
         "label": "첨부파일 위치",
         "description": "메일 상단에서 첨부파일을 어디에 표시할지 설정해요",
-        "beside-sender": "보낸 사람 옆",
-        "below-header": "제목 아래"
+        "below-header": "제목 아래",
+        "below-message": "메시지 아래 카드"
       },
       "emails_per_page": {
         "10": "10개",
@@ -2582,7 +2589,9 @@
       "group_by_letter_description": "연락처 목록에 알파벳순 섹션 헤더 표시",
       "group_by_letter_label": "첫 글자로 그룹화",
       "sort_by_last_name_label": "성으로 정렬",
-      "sort_by_last_name_description": "가족 구성원이 함께 표시되도록 연락처 목록을 성 기준으로 정렬합니다"
+      "sort_by_last_name_description": "가족 구성원이 함께 표시되도록 연락처 목록을 성 기준으로 정렬합니다",
+      "show_directory_label": "디렉터리 표시",
+      "show_directory_description": "연락처의 \"디렉터리\"에 메일 서버의 계정과 그룹을 표시합니다"
     },
     "calendar_management": {
       "delete_title": "캘린더를 삭제할까요?",
@@ -2673,6 +2682,7 @@
       "include_spam": "스팸으로 표시된 메시지도 이동",
       "attachment_type_placeholder": "예: pdf, doc, jpg",
       "value_placeholder_multi": "값 (쉼표로 여러 개 구분)",
+      "regex_placeholder": "정규식 (예: ^Cron|mailman)",
       "condition_fields": {
         "attachment": "첨부 파일",
         "from": "보낸 사람",
@@ -2694,6 +2704,7 @@
         "starts_with": "다음으로 시작",
         "ends_with": "다음으로 끝남",
         "matches": "패턴 일치",
+        "regex": "정규식과 일치",
         "greater_than": "다음보다 큼",
         "less_than": "다음보다 작음",
         "address_is": "주소가 다음과 같음",
@@ -2756,6 +2767,7 @@
       "validation_action_forward": "전달할 주소를 입력하세요",
       "validation_action_reject": "거부 메시지를 입력하세요",
       "validation_header_name": "헤더 이름에는 영문자(A-Z), 숫자, 하이픈, 밑줄만 쓸 수 있어요",
+      "validation_regex": "올바르지 않은 정규식입니다",
       "templates_section": "템플릿으로 시작하기",
       "template_newsletters": "뉴스레터를 특정 폴더로 이동",
       "template_receipts": "영수증 자동 보관",
@@ -3353,7 +3365,7 @@
       "row_url_required": "서버 {index}: URL은 필수예요",
       "row_url_scheme": "서버 {index}: URL은 http:// 또는 https://로 시작해야 해요",
       "stalwart": "Stalwart 전용 기능 사용",
-      "stalwart_hint": "비밀번호 변경과 Sieve 필터 관리를 추가해요. 다른 서버에서 켜도 문제없어요."
+      "stalwart_hint": "보안 페이지(비밀번호, 2단계 인증, 앱 비밀번호)와 삭제된 항목 복구를 추가해요. 다른 서버에서 켜도 문제없어요."
     },
     "auth": {
       "title": "인증",
@@ -4498,6 +4510,11 @@
       "show_time_in_month_view_desc": "월간 캘린더에서도 일정 시간을 표시해요",
       "tinted_events": "연한 일정 색상",
       "tinted_events_desc": "일정을 꽉 찬 블록 대신 Outlook이나 인쇄본처럼 캘린더 색상의 연한 색조와 앞쪽의 색상 막대로 표시합니다.",
+      "month_timed_events": "월 보기의 시간 지정 일정",
+      "month_timed_events_desc": "월 보기에서 시작 시간이 있는 일정을 표시하는 방식입니다. 종일 일정과 여러 날 일정은 막대로 유지됩니다.",
+      "month_timed_events_bar": "막대",
+      "month_timed_events_text": "색상 텍스트",
+      "month_timed_events_dot": "점과 텍스트",
       "show_week_numbers": "주 차 번호 표시",
       "show_week_numbers_desc": "미니 캘린더에 1년 중 몇 주 차인지 표시해요",
       "calendar_free_scroll": "자유 스크롤",
@@ -5042,7 +5059,6 @@
     "settings_ascending": "오름차순",
     "settings_descending": "내림차순",
     "disabled_title": "관리자가 파일 기능을 비활성화했어요",
-    "disabled_description": "WebDAV를 통한 대용량 파일 업로드는 Stalwart/RocksDB의 불안정을 일으킬 수 있어요. 메모리 부족 크래시나 복구 불가능한 디스크 사용 문제가 발생할 수 있으며, 삭제된 파일이 즉시 삭제되지 않을 수 있습니다. 운영 환경에서는 이 기능을 권장하지 않아요.",
     "no_accounts": "연결된 계정이 없습니다.",
     "open_folder_tree": "폴더 트리 열기",
     "migration_title": "파일 업데이트 중…",
@@ -5396,7 +5412,7 @@
   },
   "pwa_install": {
     "title": "{appName} 설치",
-    "description": "빠른 액세스와 오프라인 지원을 위해 앱을 설치하세요.",
+    "description": "빠르게 액세스하려면 앱을 설치하세요.",
     "not_now": "나중에",
     "install": "설치",
     "dont_remind": "다시 알리지 않음",

@@ -213,6 +213,13 @@ interface EmailStore {
    */
   accountMailboxes: Record<string, Mailbox[]>;
   /**
+   * The shared (group/delegated) mailboxes each login can reach, keyed by
+   * login. Kept apart from `accountMailboxes`, which holds a login's own
+   * folders only, so nothing that looks up a role there picks a shared one.
+   * Only the Pro sidebar reads it, to list them under each login (#1486).
+   */
+  accountSharedMailboxes: Record<string, Mailbox[]>;
+  /**
    * When set, the mail view is reading from this account instead of the
    * global active one. `null` means "use the global active account" - i.e.
    * the standard single-account behavior. Selecting a folder under a
@@ -437,7 +444,7 @@ interface EmailStore {
   /** `ownerAccountId`: the JMAP account a link names for the message (#1351). */
   fetchEmailContent: (client: IJMAPClient, emailId: string, ownerAccountId?: string) => Promise<Email | null>;
   fetchQuota: (client: IJMAPClient) => Promise<void>;
-  sendEmail: (client: IJMAPClient, to: string[], subject: string, body: string, cc?: string[], bcc?: string[], identityId?: string, fromEmail?: string, draftId?: string, fromName?: string, htmlBody?: string, attachments?: Array<{ blobId: string; name: string; type: string; size: number; disposition?: 'attachment' | 'inline'; cid?: string }>, inReplyTo?: string[], references?: string[], delayedUntil?: string, envelopeMailFrom?: string, options?: { requestReadReceipt?: boolean; requestDsn?: boolean; requireTls?: boolean; priority?: MessagePriority; localAccountId?: string; draftAccountId?: string }) => Promise<SendEmailResult>;
+  sendEmail: (client: IJMAPClient, to: string[], subject: string, body: string, cc?: string[], bcc?: string[], identityId?: string, fromEmail?: string, draftId?: string, fromName?: string, htmlBody?: string, attachments?: Array<{ blobId: string; name: string; type: string; size: number; disposition?: 'attachment' | 'inline'; cid?: string }>, inReplyTo?: string[], references?: string[], delayedUntil?: string, envelopeMailFrom?: string, options?: { requestReadReceipt?: boolean; requestDsn?: boolean; requireTls?: boolean; priority?: MessagePriority; headers?: Record<string, string>; localAccountId?: string; draftAccountId?: string }) => Promise<SendEmailResult>;
   sendRawEmail: (client: IJMAPClient, rawMimeBlob: Blob, identityId: string, delayedUntil?: string, envelopeRecipients?: string[]) => Promise<SendEmailResult>;
   /** `emailKey` (emailKeyFor of the row) picks the right row when the id repeats across accounts. */
   deleteEmail: (client: IJMAPClient, emailId: string, forceDelete?: boolean, emailKey?: string) => Promise<boolean>;
@@ -1853,12 +1860,24 @@ async function unifiedMailboxesFor(
  * the unified scope uses, so the two never fetch the same list twice and a
  * list already there is not fetched again until that login reports a change.
  */
-export async function loadAccountMailboxes(client: IJMAPClient, accountId: string): Promise<boolean> {
+export async function loadAccountMailboxes(
+  client: IJMAPClient,
+  accountId: string,
+  opts: { withShared?: boolean } = {},
+): Promise<boolean> {
+  const withShared = opts.withShared ?? false;
   try {
-    const { mailboxes, fresh } = await unifiedMailboxesFor(client, false);
-    if (!fresh && useEmailStore.getState().accountMailboxes[accountId]) return true;
+    const { mailboxes, fresh } = await unifiedMailboxesFor(client, withShared);
+    const state = useEmailStore.getState();
+    if (!fresh && state.accountMailboxes[accountId] && (!withShared || state.accountSharedMailboxes[accountId])) return true;
+    // With the shared ones the list is getAllMailboxes: own folders go where
+    // they always went, the shared ones beside them.
+    const own = withShared ? mailboxes.filter((m) => !m.isShared) : mailboxes.slice();
     useEmailStore.setState((state) => ({
-      accountMailboxes: { ...state.accountMailboxes, [accountId]: mailboxes.slice() },
+      accountMailboxes: { ...state.accountMailboxes, [accountId]: own },
+      ...(withShared
+        ? { accountSharedMailboxes: { ...state.accountSharedMailboxes, [accountId]: mailboxes.filter((m) => m.isShared) } }
+        : {}),
     }));
     return true;
   } catch (error) {
@@ -3238,6 +3257,7 @@ export const useEmailStore = create<EmailStore>((set, get) => ({
   emails: [],
   mailboxes: [],
   accountMailboxes: {},
+  accountSharedMailboxes: {},
   viewingAccountId: null,
   selectedEmail: null,
   selectedMailbox: "",
@@ -5509,13 +5529,17 @@ export const useEmailStore = create<EmailStore>((set, get) => ({
       if (!email) return false;
 
       const isFlagged = email.keywords.$flagged || false;
-      if (emailHooks.onBeforeEmailStarToggle.size > 0
-        && !(await emailHooks.onBeforeEmailStarToggle.intercept({ emailIds: [emailId], starred: !isFlagged }))) {
-        return false;
-      }
       // In unified view route to the email's own account client + owner accountId
       // (the reaching client's primary is not the owner for shared sources). (#281)
       const { client: actionClient, accountId } = resolveEmailActionContext(email, client);
+      // The hooks name the account as message-row-actions' click does: only
+      // when it is not the user's own, since ids repeat across accounts.
+      const hookAccountId = accountId && accountId !== actionClient.getAccountId?.() ? accountId : undefined;
+      const hookPayload = { emailIds: [emailId], starred: !isFlagged, ...(hookAccountId ? { accountId: hookAccountId } : {}) };
+      if (emailHooks.onBeforeEmailStarToggle.size > 0
+        && !(await emailHooks.onBeforeEmailStarToggle.intercept(hookPayload))) {
+        return false;
+      }
       await actionClient.toggleStar(emailId, !isFlagged, accountId);
 
       // Update local state
@@ -5535,7 +5559,7 @@ export const useEmailStore = create<EmailStore>((set, get) => ({
           emailId,
         ),
       }));
-      void emailHooks.onEmailStarToggle.emit({ emailIds: [emailId], starred: !isFlagged });
+      void emailHooks.onEmailStarToggle.emit(hookPayload);
       refillAfterKeywordChange(get, client, ['$flagged']);
     } catch (error) {
       set({

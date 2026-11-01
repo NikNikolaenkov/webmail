@@ -1,5 +1,5 @@
 {
-  "meta_description": "Client de webmail minimalist care utilizează protocolul JMAP",
+  "meta_description": "Webmail auto-găzduit pentru e-mail, calendar, contacte și fișiere, construit pe JMAP",
   "login": {
     "title": "Webmail",
     "username_label": "E-mail",
@@ -473,6 +473,9 @@
     "source_truncated": "Se afișează primii {size}. Exportă mesajul pentru rest.",
     "source_copied": "Sursă copiată în clipboard",
     "attachments": "Anexe",
+    "attachments_count": "{count, plural, one {# atașament} few {# atașamente} other {# de atașamente}}",
+    "attachments_show_more": "Afișează încă {count}",
+    "attachments_show_fewer": "Afișează mai puține",
     "important": "Important",
     "download": "Descărcați",
     "download_all": "Descărcați tot",
@@ -1506,7 +1509,7 @@
       },
       "unified_mailbox": {
         "label": "Căsuță poștală unificată",
-        "description": "Afișați folderele combinate (Mesaje primite, Mesaje trimise etc.) pentru toate conturile conectate",
+        "description": "Afișați folderele combinate (Mesaje primite, Mesaje trimise etc.) pentru contul activ și folderele sale partajate. Secțiunea apare doar când există ceva de combinat: combinarea tuturor conturilor este activată și sunt conectate mai multe conturi, o căsuță de e-mail de grup este inclusă mai jos, sau Toată poșta, Necitite ori Cu stea este activată. Acestea trei sunt opțiuni separate, care apar doar după ce administratorul le activează.",
         "cross_account": {
           "label": "Across all accounts",
           "description": "Merge the unified mailbox across every connected account instead of staying within the active account."
@@ -1541,6 +1544,10 @@
       "show_shared_mail_accounts": {
         "label": "Afișează conturile de e-mail partajate",
         "description": "Afișează folderele cutiilor poștale partajate cu tine la Partajat, în bara laterală. Dezactivează pentru a le ascunde pe toate sau ascunde conturi individuale mai jos. Calendarele și contactele lor rămân."
+      },
+      "compact_shared_mailboxes": {
+        "label": "Căsuțe partajate compacte",
+        "description": "Afișează fiecare căsuță poștală partajată ca un singur rând care îi deschide mesajele primite, cu dosarele dedesubt. Dosarele goale, precum Ciorne sau Coș de gunoi, sunt omise."
       },
       "pro_interface": {
         "label": "Interfață Pro (experimentală)",
@@ -1899,8 +1906,8 @@
       "attachment_position": {
         "label": "Poziția atașamentului",
         "description": "Unde să afișați atașamentele în antetul e-mailului",
-        "beside-sender": "Lângă expeditor",
-        "below-header": "Sub antet"
+        "below-header": "Sub antet",
+        "below-message": "Carduri sub mesaj"
       },
       "emails_per_page": {
         "10": "10 e-mailuri",
@@ -2579,6 +2586,8 @@
       "group_by_letter_label": "Grupați după prima literă",
       "sort_by_last_name_label": "Sortare după nume de familie",
       "sort_by_last_name_description": "Ordonați lista de contacte după numele de familie, astfel încât membrii familiei să apară împreună",
+      "show_directory_label": "Afișează directorul",
+      "show_directory_description": "Afișează conturile și grupurile de pe serverul de e-mail la „Director” în Contacte",
       "group_by_letter_description": "Afișați titlurile secțiunilor în ordine alfabetică în lista de contacte",
       "import_label": "Importați contactele",
       "import_description": "Importați contactele dintr-un fișier „vCard” (.vcf)",
@@ -2680,6 +2689,7 @@
       "include_spam": "Mută și mesajele marcate ca spam",
       "attachment_type_placeholder": "de ex. pdf, doc, jpg",
       "value_placeholder_multi": "Valoare (mai multe valori separate prin virgule)",
+      "regex_placeholder": "Expresie regulată, de ex. ^Cron|mailman",
       "condition_fields": {
         "attachment": "Atașament",
         "from": "De la",
@@ -2701,6 +2711,7 @@
         "starts_with": "începe cu",
         "ends_with": "se termină cu",
         "matches": "se potrivește cu modelul",
+        "regex": "se potrivește cu expresia regulată",
         "greater_than": "este mai mare decât",
         "less_than": "este mai mic decât",
         "address_is": "este adresa",
@@ -2763,6 +2774,7 @@
       "validation_action_forward": "Introduceți o adresă către care să se redirecționeze",
       "validation_action_reject": "Introduceți mesajul de respingere",
       "validation_header_name": "Numele antetelor pot conține doar literele A-Z, cifre, cratime și liniuțe de subliniere",
+      "validation_regex": "Această expresie regulată nu este validă",
       "templates_section": "Începeți de la șablon",
       "template_newsletters": "Mutați buletinele informative în dosar",
       "template_receipts": "Arhivarea automată a confirmărilor de primire",
@@ -3353,7 +3365,7 @@
       "row_url_required": "Serverul nr. {index}: URL-ul este obligatoriu",
       "row_url_scheme": "Serverul nr. {index}: URL-ul trebuie să înceapă cu http:// sau https://",
       "stalwart": "Activați funcțiile specifice Stalwart",
-      "stalwart_hint": "Adaugă schimbarea parolei și gestionarea filtrelor Sieve. Poate fi activat fără risc și pe alte servere."
+      "stalwart_hint": "Adaugă pagina Securitate (parolă, autentificare în doi pași și parole pentru aplicații) și recuperarea elementelor șterse. Poate fi activat fără risc și pe alte servere."
     },
     "auth": {
       "title": "Autentificare",
@@ -4498,6 +4510,11 @@
       "show_time_in_month_view_desc": "Afișați orele evenimentelor în vizualizarea calendarului lunar",
       "tinted_events": "Culori deschise pentru evenimente",
       "tinted_events_desc": "Afișează evenimentele într-o nuanță deschisă a culorii calendarului, cu o bară colorată la început, ca în Outlook și la tipărire, în loc de blocuri pline.",
+      "month_timed_events": "Evenimente cu oră în vizualizarea lunară",
+      "month_timed_events_desc": "Cum apar în vizualizarea lunară evenimentele cu oră de început. Evenimentele de o zi întreagă și cele de mai multe zile rămân bare.",
+      "month_timed_events_bar": "Bară",
+      "month_timed_events_text": "Text colorat",
+      "month_timed_events_dot": "Punct și text",
       "show_week_numbers": "Afișați numerele săptămânilor",
       "show_week_numbers_desc": "Afișați numerele săptămânilor în mini-calendar",
       "calendar_free_scroll": "Derulare liberă",
@@ -5174,7 +5191,6 @@
     "settings_ascending": "În ordine crescătoare",
     "settings_descending": "Descendent",
     "disabled_title": "Funcția de fișiere este dezactivată de administratorul dvs.",
-    "disabled_description": "Încărcarea fișierelor de dimensiuni mari prin intermediul WebDAV poate provoca instabilitate în Stalwart /RocksDB, inclusiv blocări din cauza epuizării memoriei și utilizare irecuperabilă a spațiului pe disc. Este posibil ca fișierele șterse să nu fie eliminate imediat din spațiul de stocare blob. Această funcție nu este recomandată pentru mediile de producție.",
     "migration_title": "Se actualizează fișierele...",
     "migration_description": "Organizarea dosarelor și a fișierelor în structura corespunzătoare. Această operațiune se efectuează o singură dată.",
     "new": "Nou",
@@ -5396,7 +5412,7 @@
   },
   "pwa_install": {
     "title": "Instalați {appName}",
-    "description": "Instalați aplicația noastră pentru acces rapid și asistență offline.",
+    "description": "Instalați aplicația noastră pentru acces rapid.",
     "not_now": "Nu acum",
     "install": "Instalați",
     "dont_remind": "Nu-mi mai reaminti",

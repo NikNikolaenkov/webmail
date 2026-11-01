@@ -1,5 +1,5 @@
 {
-  "meta_description": "Minimalistický webmailový klient využívající protokol JMAP",
+  "meta_description": "Webmail pro vlastní hosting s poštou, kalendářem, kontakty a soubory, postavený na JMAP",
   "login": {
     "title": "Webmail",
     "username_label": "E-mail",
@@ -473,6 +473,9 @@
     "source_truncated": "Zobrazeno prvních {size}. Zbytek uvidíte po exportu zprávy.",
     "source_copied": "Zdrojový kód byl zkopírován do schránky",
     "attachments": "Přílohy",
+    "attachments_count": "{count, plural, one {# příloha} few {# přílohy} many {# přílohy} other {# příloh}}",
+    "attachments_show_more": "Zobrazit dalších {count}",
+    "attachments_show_fewer": "Zobrazit méně",
     "important": "Důležité",
     "download": "Stáhnout",
     "download_all": "Stáhnout vše",
@@ -1503,7 +1506,7 @@
       },
       "unified_mailbox": {
         "label": "Sjednocená schránka",
-        "description": "Zobrazovat sloučené složky (Doručené, Odeslané atd.) ze všech připojených účtů",
+        "description": "Zobrazovat sloučené složky (Doručené, Odeslané atd.) aktivního účtu a jeho sdílených složek. Sekce se objeví, jen když je co slučovat: je zapnuto „Napříč všemi účty“ a připojen více než jeden účet, níže je zahrnuta skupinová schránka, nebo je zapnuta Veškerá pošta, Nepřečtené či S hvězdičkou. Tyto tři jsou samostatné volby, které se objeví až poté, co je zapne správce.",
         "cross_account": {
           "label": "Napříč všemi účty",
           "description": "Sloučit sjednocenou schránku napříč všemi připojenými účty místo omezení na aktivní účet."
@@ -1538,6 +1541,10 @@
       "show_shared_mail_accounts": {
         "label": "Zobrazit sdílené poštovní účty",
         "description": "Zobrazit složky schránek sdílených s vámi v postranním panelu pod Sdílené. Vypnutím skryjete všechny, nebo níže skryjte jednotlivé účty. Jejich kalendáře a kontakty zůstanou."
+      },
+      "compact_shared_mailboxes": {
+        "label": "Kompaktní sdílené schránky",
+        "description": "Zobrazit každou sdílenou schránku jako jeden řádek, který otevře její Doručené, se složkami pod ním. Prázdné složky jako Koncepty nebo Koš se vynechají."
       },
       "pro_interface": {
         "label": "Pro rozhraní (experimentální)",
@@ -1896,8 +1903,8 @@
       "attachment_position": {
         "label": "Pozice příloh",
         "description": "Kde zobrazovat přílohy v hlavičce e-mailu",
-        "beside-sender": "Vedle odesílatele",
-        "below-header": "Pod hlavičkou"
+        "below-header": "Pod hlavičkou",
+        "below-message": "Karty pod zprávou"
       },
       "emails_per_page": {
         "10": "10 zpráv",
@@ -2572,6 +2579,8 @@
       "group_by_letter_label": "Seskupit podle prvního písmena",
       "sort_by_last_name_label": "Řadit podle příjmení",
       "sort_by_last_name_description": "Seřadit seznam kontaktů podle příjmení, aby členové rodiny byli pohromadě",
+      "show_directory_label": "Zobrazit adresář organizace",
+      "show_directory_description": "Zobrazit účty a skupiny na poštovním serveru v Kontaktech pod položkou „Adresář organizace“",
       "group_by_letter_description": "Zobrazit záhlaví sekcí podle abecedy v seznamu kontaktů",
       "import_label": "Importovat kontakty",
       "import_description": "Importovat kontakty ze souboru vCard (.vcf)",
@@ -2673,6 +2682,7 @@
       "include_spam": "Přesouvat i zprávy označené jako spam",
       "attachment_type_placeholder": "např. pdf, doc, jpg",
       "value_placeholder_multi": "Hodnota (více oddělených čárkami)",
+      "regex_placeholder": "Regulární výraz, např. ^Cron|mailman",
       "condition_fields": {
         "attachment": "Příloha",
         "from": "Od",
@@ -2694,6 +2704,7 @@
         "starts_with": "začíná na",
         "ends_with": "končí na",
         "matches": "odpovídá vzoru",
+        "regex": "odpovídá regulárnímu výrazu",
         "greater_than": "je větší než",
         "less_than": "je menší než",
         "address_is": "je adresa",
@@ -2756,6 +2767,7 @@
       "validation_action_forward": "Zadejte adresu, na kterou se má přeposílat",
       "validation_action_reject": "Zadejte zprávu o odmítnutí",
       "validation_header_name": "Názvy hlaviček smí obsahovat jen písmena A-Z, číslice, pomlčky a podtržítka",
+      "validation_regex": "Tento regulární výraz není platný",
       "templates_section": "Začít ze šablony",
       "template_newsletters": "Přesunout newslettery do složky",
       "template_receipts": "Automaticky archivovat účtenky",
@@ -3353,7 +3365,7 @@
       "row_url_required": "Server č. {index}: URL je povinná",
       "row_url_scheme": "Server č. {index}: URL musí začínat http:// nebo https://",
       "stalwart": "Zapnout funkce specifické pro Stalwart",
-      "stalwart_hint": "Přidá změnu hesla a správu filtrů Sieve. Bezpečně lze zapnout i u jiných serverů."
+      "stalwart_hint": "Přidá stránku Zabezpečení (heslo, dvoufázové ověření a hesla aplikací) a obnovu smazaných položek. Bezpečně lze zapnout i u jiných serverů."
     },
     "auth": {
       "title": "Ověřování",
@@ -4498,6 +4510,11 @@
       "show_time_in_month_view_desc": "Zobrazovat časy událostí v měsíčním zobrazení kalendáře",
       "tinted_events": "Světlé barvy událostí",
       "tinted_events_desc": "Zobrazovat události ve světlém odstínu barvy kalendáře s barevným pruhem na začátku, jako v Outlooku a při tisku, místo plných bloků.",
+      "month_timed_events": "Události s časem v měsíčním zobrazení",
+      "month_timed_events_desc": "Jak vypadají události s časem začátku v měsíčním zobrazení. Celodenní a vícedenní události zůstávají pruhy.",
+      "month_timed_events_bar": "Pruh",
+      "month_timed_events_text": "Barevný text",
+      "month_timed_events_dot": "Tečka a text",
       "show_week_numbers": "Zobrazit čísla týdnů",
       "show_week_numbers_desc": "Zobrazovat čísla týdnů v minikalendáři",
       "calendar_free_scroll": "Volné posouvání",
@@ -5042,7 +5059,6 @@
     "settings_ascending": "Vzestupně",
     "settings_descending": "Sestupně",
     "disabled_title": "Funkce Soubory je zakázána správcem",
-    "disabled_description": "Nahrávání velkých souborů přes WebDAV může způsobit nestabilitu Stalwart/RocksDB, včetně pádů z důvodu nedostatku paměti a nevratného zaplnění disku. Odstraněné soubory nemusí být okamžitě odstraněny z úložiště. Tato funkce se nedoporučuje v produkčním prostředí.",
     "no_accounts": "Žádné připojené účty.",
     "open_folder_tree": "Otevřít strom složek",
     "migration_title": "Aktualizace vašich souborů…",
@@ -5396,7 +5412,7 @@
   },
   "pwa_install": {
     "title": "Nainstalovat {appName}",
-    "description": "Nainstalujte si naši aplikaci pro rychlý přístup a offline podporu.",
+    "description": "Nainstalujte si naši aplikaci pro rychlý přístup.",
     "not_now": "Teď ne",
     "install": "Nainstalovat",
     "dont_remind": "Už mi to nepřipomínat",

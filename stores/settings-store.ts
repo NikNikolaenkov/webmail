@@ -302,7 +302,8 @@ export type FirstDayOfWeek = 0 | 1 | 6; // 0 = Sunday, 1 = Monday, 6 = Saturday
 export type TimeZoneSetting = 'auto' | (string & {});
 export type ExternalContentPolicy = 'ask' | 'block' | 'allow';
 export type MailAttachmentAction = 'preview' | 'download';
-export type AttachmentPosition = 'beside-sender' | 'below-header';
+/** 'below-header': a bar of tiles under the header. 'below-message': preview cards after the body. */
+export type AttachmentPosition = 'below-header' | 'below-message';
 export type ToolbarPosition = 'top' | 'below-subject';
 export type ArchiveMode = 'single' | 'year' | 'month';
 export type MailLayout = 'split' | 'focus' | 'horizontal';
@@ -337,6 +338,13 @@ export type MessageSpacing = 'auto' | 'always' | 'edge';
 /** Font used to render text/plain email bodies. */
 export type PlainTextFont = 'mono' | 'sans';
 export type CalendarHoverPreview = 'off' | 'instant' | 'delay-500ms' | 'delay-1s' | 'delay-2s';
+/**
+ * How the month view draws an event with a start time (#1449): a filled bar
+ * like all-day events, its time and title in the calendar colour, or a dot
+ * in the calendar colour before them.
+ */
+export type MonthTimedEventStyle = 'bar' | 'text' | 'dot';
+export const MONTH_TIMED_EVENT_STYLES: readonly MonthTimedEventStyle[] = ['bar', 'text', 'dot'];
 export type SendDelaySeconds = 0 | 10 | 30 | 60;
 export type ProtocolOpenMode = 'active-session' | 'new-tab';
 
@@ -570,7 +578,6 @@ interface SettingsState extends AccessibilitySettings {
   swipeLeftAction: SwipeAction; // Mobile: action when a list row is swiped left
 
   // Composer
-  autoSaveDraftInterval: number; // milliseconds
   sendConfirmation: boolean;
   quickReplyEnabled: boolean;
   defaultReplyMode: ReplyMode;
@@ -602,6 +609,8 @@ interface SettingsState extends AccessibilitySettings {
   showTimeInMonthView: boolean;
   /** Events as a light tint of their colour with a bar at the start (the Outlook look), not solid blocks. */
   calendarTintedEvents: boolean;
+  /** Month view look of events with a start time (#1449). All-day and multi-day events stay bars. */
+  calendarMonthTimedEvents: MonthTimedEventStyle;
   showWeekNumbers: boolean;
   /** Scroll continuously through months/weeks/days (#759) instead of one period at a time. */
   calendarFreeScroll: boolean;
@@ -633,6 +642,9 @@ interface SettingsState extends AccessibilitySettings {
   // Sort (and group) the contact list by surname instead of given name so
   // family members sit together (#963).
   sortContactsByLastName: boolean;
+  // The Directory entry in the Contacts sidebar (#1457). Autocomplete, the
+  // share dialog and free/busy use the directory either way.
+  showContactsDirectory: boolean;
 
   // Files: view, sort and icons (Settings > Files)
   filesSettings: FilesSettings;
@@ -713,6 +725,9 @@ interface SettingsState extends AccessibilitySettings {
   // Turning it off hides every shared account's folders; their calendars,
   // contacts and files stay. (#1228)
   showSharedMailAccounts: boolean;
+  // Each shared account's mail as one row that is its inbox, its folders
+  // below it and its empty Drafts, Scheduled, Junk and Trash left out (#1342).
+  compactSharedMailboxes: boolean;
   // Shared accounts whose mail folders are hidden one by one, keyed by
   // AccountEntry.id -> JMAP accountIds, since those ids are per server.
   hiddenSharedMailAccounts: Record<string, string[]>;
@@ -792,6 +807,12 @@ interface SettingsState extends AccessibilitySettings {
     opts?: { internal?: boolean }
   ) => void;
   resetToDefaults: () => void;
+  /**
+   * Forgets the user's own value for each of `keys`: the setting loses its
+   * "chosen by the user" mark and takes the admin default (policy.defaults)
+   * again, or the built-in one when the admin set none.
+   */
+  resetSettings: (keys: readonly string[]) => void;
   /**
    * Applies the admin policy (#1248): `policy.defaults` to every setting the
    * user has not chosen, and a locked restriction's value to its setting
@@ -880,7 +901,7 @@ const DEFAULT_SETTINGS = {
   messageSpacing: 'auto' as MessageSpacing,
   plainTextFont: 'sans' as PlainTextFont,
   mailAttachmentAction: 'preview' as MailAttachmentAction,
-  attachmentPosition: 'beside-sender' as AttachmentPosition,
+  attachmentPosition: 'below-header' as AttachmentPosition,
   emailAlwaysLightMode: false,
   archiveMode: 'single' as ArchiveMode,
   hoverActions: ['delete', 'star', 'markRead', 'archive'] as HoverAction[],
@@ -890,7 +911,6 @@ const DEFAULT_SETTINGS = {
   swipeLeftAction: 'delete' as SwipeAction,
 
   // Composer
-  autoSaveDraftInterval: 60000, // 1 minute
   sendConfirmation: false,
   quickReplyEnabled: true,
   defaultReplyMode: 'reply' as ReplyMode,
@@ -917,6 +937,7 @@ const DEFAULT_SETTINGS = {
   // Calendar
   showTimeInMonthView: false,
   calendarTintedEvents: false,
+  calendarMonthTimedEvents: 'bar' as MonthTimedEventStyle,
   showWeekNumbers: false,
   calendarFreeScroll: true,
   calendarHoverPreview: 'delay-500ms' as CalendarHoverPreview,
@@ -939,6 +960,7 @@ const DEFAULT_SETTINGS = {
   // Contacts Display
   groupContactsByLetter: true,
   sortContactsByLastName: false,
+  showContactsDirectory: true,
 
   // Files
   filesSettings: DEFAULT_FILES_SETTINGS,
@@ -993,6 +1015,7 @@ const DEFAULT_SETTINGS = {
   showAccountDot: true,
   showFolderTotalCount: true,
   showSharedMailAccounts: true,
+  compactSharedMailboxes: false,
   hiddenSharedMailAccounts: {} as Record<string, string[]>,
 
   // Folders
@@ -1101,6 +1124,7 @@ function isAllowedPolicyValue(key: string, value: unknown, restriction?: Setting
   if (key === 'sendDelaySeconds' && ![0, 10, 30, 60].includes(value as number)) return false;
   if (key === 'subAddressDelimiter' && !isValidSubAddressDelimiter(value as string)) return false;
   if (key === 'messageListOrderScope' && value !== 'inbox' && value !== 'all') return false;
+  if (key === 'calendarMonthTimedEvents' && !MONTH_TIMED_EVENT_STYLES.includes(value as MonthTimedEventStyle)) return false;
   if (!isAllowedAccessibilityValue(key, value)) return false;
   if (restriction && typeof restriction === 'object') {
     if (Array.isArray(restriction.allowedValues) && !restriction.allowedValues.includes(value)) return false;
@@ -1316,7 +1340,6 @@ export const useSettingsStore = create<SettingsState>()(
           swipeLeftAction: state.swipeLeftAction,
           disableThreading: state.disableThreading,
           trustedSenders: state.trustedSenders,
-          autoSaveDraftInterval: state.autoSaveDraftInterval,
           sendConfirmation: state.sendConfirmation,
           quickReplyEnabled: state.quickReplyEnabled,
           defaultReplyMode: state.defaultReplyMode,
@@ -1349,10 +1372,12 @@ export const useSettingsStore = create<SettingsState>()(
           sharedCalendarColors: state.sharedCalendarColors,
           groupContactsByLetter: state.groupContactsByLetter,
           sortContactsByLastName: state.sortContactsByLastName,
+          showContactsDirectory: state.showContactsDirectory,
           filesSettings: state.filesSettings,
           expandedFilterView: state.expandedFilterView,
           showTimeInMonthView: state.showTimeInMonthView,
           calendarTintedEvents: state.calendarTintedEvents,
+          calendarMonthTimedEvents: state.calendarMonthTimedEvents,
           showWeekNumbers: state.showWeekNumbers,
           calendarFreeScroll: state.calendarFreeScroll,
           calendarHoverPreview: state.calendarHoverPreview,
@@ -1384,6 +1409,7 @@ export const useSettingsStore = create<SettingsState>()(
           showAccountDot: state.showAccountDot,
           showFolderTotalCount: state.showFolderTotalCount,
           showSharedMailAccounts: state.showSharedMailAccounts,
+          compactSharedMailboxes: state.compactSharedMailboxes,
           hiddenSharedMailAccounts: state.hiddenSharedMailAccounts,
           folderIcons: state.folderIcons,
           folderCountModes: state.folderCountModes,
@@ -1478,6 +1504,26 @@ export const useSettingsStore = create<SettingsState>()(
         void settingsHooks.onSettingsReset.emit({});
       },
 
+      resetSettings: (keys) => {
+        const own = keys.filter((key) => hasOwn(DEFAULT_SETTINGS, key) && key !== 'explicitSettings' && !BOOKKEEPING_SETTING_KEYS.has(key));
+        if (own.length === 0) return;
+        const before = get() as unknown as Record<string, unknown>;
+        const previous = Object.fromEntries(own.map((key) => [key, before[key]]));
+        const dropped = new Set(own);
+        set({
+          ...Object.fromEntries(own.map((key) => [key, builtInDefault(key)])),
+          explicitSettings: get().explicitSettings.filter((key) => !dropped.has(key)),
+        } as Partial<SettingsState>);
+        applyAdminPolicyPatch();
+        applyVisualSettings();
+        const after = get() as unknown as Record<string, unknown>;
+        for (const key of own) {
+          if (after[key] !== previous[key]) {
+            void settingsHooks.onSettingChange.emit({ key, value: after[key], previous: previous[key] });
+          }
+        }
+      },
+
       exportSettings: (opts) => {
         const json = buildExport(opts);
         if (!opts?.forSync) {
@@ -1501,6 +1547,7 @@ export const useSettingsStore = create<SettingsState>()(
           migrateAnimationsSetting(settings);
           migrateNotificationSoundDefault(settings);
           migrateTintListRowsDefault(settings);
+          migrateAttachmentPosition(settings);
 
           // Apply settings, noting which keys were taken over for the
           // onSettingsImport hook.
@@ -1902,7 +1949,7 @@ export const useSettingsStore = create<SettingsState>()(
     },
     {
       name: 'settings-storage',
-      version: 11,
+      version: 12,
       migrate: migrateSettings,
       onRehydrateStorage: () => {
         return (state) => {
@@ -1954,6 +2001,8 @@ export function migrateSettings(persisted: unknown, version: number): SettingsSt
           state.protocolOpenMode = state.protocolMailtoOpenMode;
         }
         delete state.protocolMailtoOpenMode;
+        // Never read: drafts save 2 s after the last change.
+        delete state.autoSaveDraftInterval;
         // v4: `dateFormat` was repurposed from 'regional'|'iso'|'custom' to
         // 'smart'|'relative'|'full'. The old setting was never read anywhere,
         // so every persisted value maps to the new default.
@@ -2005,6 +2054,8 @@ export function migrateSettings(persisted: unknown, version: number): SettingsSt
         // taken as chosen below.
         migrateNotificationSoundDefault(state);
         migrateTintListRowsDefault(state);
+        // The old default must not be taken as chosen below either.
+        migrateAttachmentPosition(state);
         // v8: admin policy defaults (#1248) skip settings the user chose.
         // Earlier builds did not record that, so a setting that differs from
         // the build default is taken as chosen.
@@ -2013,6 +2064,18 @@ export function migrateSettings(persisted: unknown, version: number): SettingsSt
         }
         migrateAnimationsSetting(state);
         return state as unknown as SettingsState;
+}
+
+/**
+ * v12: the attachments next to the sender ('beside-sender', the old default)
+ * gave way to the bar under the header. Imports and server copies from older
+ * builds still carry the old value and go through this too.
+ */
+export function migrateAttachmentPosition(state: Record<string, unknown>): void {
+  if (state.attachmentPosition === undefined) return;
+  if (state.attachmentPosition !== 'below-header' && state.attachmentPosition !== 'below-message') {
+    state.attachmentPosition = 'below-header';
+  }
 }
 
 /**

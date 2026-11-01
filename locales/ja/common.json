@@ -1,5 +1,5 @@
 {
-  "meta_description": "JMAPプロトコルを使用するミニマルなウェブメールクライアント",
+  "meta_description": "メール、カレンダー、連絡先、ファイルを一つにまとめたセルフホスト型ウェブメール（JMAP ベース）",
   "login": {
     "title": "ウェブメール",
     "username_label": "メールアドレス",
@@ -473,6 +473,9 @@
     "source_truncated": "最初の {size} を表示しています。残りはメッセージをエクスポートしてください。",
     "source_copied": "ソースをクリップボードにコピーしました",
     "attachments": "添付ファイル",
+    "attachments_count": "{count, plural, other {# 件の添付ファイル}}",
+    "attachments_show_more": "さらに {count} 件を表示",
+    "attachments_show_fewer": "表示を減らす",
     "important": "重要",
     "download": "ダウンロード",
     "download_all": "すべてダウンロード",
@@ -1503,7 +1506,7 @@
       },
       "unified_mailbox": {
         "label": "統合メールボックス",
-        "description": "接続されたすべてのアカウントの統合フォルダ（受信トレイ、送信済みなど）を表示",
+        "description": "アクティブなアカウントとその共有フォルダーの統合フォルダー（受信トレイ、送信済みなど）を表示します。このセクションは、まとめる対象があるときだけ表示されます。すべてのアカウントの統合がオンで複数のアカウントが接続されている場合、下でグループ受信トレイを含めている場合、またはすべてのメール・未読・スター付きのいずれかがオンの場合です。この 3 つは個別のオプションで、管理者がオンにするまで表示されません。",
         "cross_account": {
           "label": "Across all accounts",
           "description": "Merge the unified mailbox across every connected account instead of staying within the active account."
@@ -1538,6 +1541,10 @@
       "show_shared_mail_accounts": {
         "label": "共有メールアカウントを表示",
         "description": "共有されたメールボックスのフォルダーをサイドバーの「共有」に表示します。オフにするとすべて非表示になります。下で個別のアカウントだけを非表示にすることもできます。カレンダーと連絡先は表示されたままです。"
+      },
+      "compact_shared_mailboxes": {
+        "label": "共有メールボックスをコンパクトに表示",
+        "description": "各共有メールボックスを、受信トレイを開く1行として表示し、その下にフォルダを並べます。下書きやゴミ箱などの空のフォルダは表示しません。"
       },
       "pro_interface": {
         "label": "Pro インターフェイス（実験的）",
@@ -1896,8 +1903,8 @@
       "attachment_position": {
         "label": "添付ファイルの位置",
         "description": "メールヘッダー内での添付ファイルの表示位置",
-        "beside-sender": "送信者の横",
-        "below-header": "ヘッダーの下"
+        "below-header": "ヘッダーの下",
+        "below-message": "メッセージの下にカードで表示"
       },
       "emails_per_page": {
         "10": "10件",
@@ -2582,7 +2589,9 @@
       "group_by_letter_description": "連絡先リストにアルファベット順のセクション見出しを表示",
       "group_by_letter_label": "頭文字でグループ化",
       "sort_by_last_name_label": "姓で並べ替え",
-      "sort_by_last_name_description": "家族が並んで表示されるように、連絡先一覧を姓の順に並べ替えます"
+      "sort_by_last_name_description": "家族が並んで表示されるように、連絡先一覧を姓の順に並べ替えます",
+      "show_directory_label": "ディレクトリを表示",
+      "show_directory_description": "連絡先の「ディレクトリ」にメールサーバーのアカウントとグループを表示します"
     },
     "calendar_management": {
       "delete_title": "カレンダーを削除しますか?",
@@ -2673,6 +2682,7 @@
       "include_spam": "迷惑メールと判定されたメッセージも移動する",
       "attachment_type_placeholder": "例: pdf, doc, jpg",
       "value_placeholder_multi": "値（カンマで複数指定可）",
+      "regex_placeholder": "正規表現（例: ^Cron|mailman）",
       "condition_fields": {
         "attachment": "添付ファイル",
         "from": "差出人",
@@ -2694,6 +2704,7 @@
         "starts_with": "で始まる",
         "ends_with": "で終わる",
         "matches": "パターンに一致",
+        "regex": "正規表現に一致",
         "greater_than": "より大きい",
         "less_than": "より小さい",
         "address_is": "のアドレスが次と一致",
@@ -2756,6 +2767,7 @@
       "validation_action_forward": "転送先のアドレスを入力してください",
       "validation_action_reject": "拒否メッセージを入力してください",
       "validation_header_name": "ヘッダー名に使用できるのは英字（A-Z）、数字、ハイフン、アンダースコアのみです",
+      "validation_regex": "この正規表現は無効です",
       "templates_section": "テンプレートから作成",
       "template_newsletters": "ニュースレターをフォルダに移動",
       "template_receipts": "領収書を自動アーカイブ",
@@ -3353,7 +3365,7 @@
       "row_url_required": "サーバー {index}: URL は必須です",
       "row_url_scheme": "サーバー {index}: URL は http:// または https:// で始める必要があります",
       "stalwart": "Stalwart 固有の機能を有効にする",
-      "stalwart_hint": "パスワード変更と Sieve フィルターの管理を追加します。ほかのサーバーで有効にしても問題ありません。"
+      "stalwart_hint": "セキュリティページ（パスワード、2 段階認証、アプリパスワード）と削除したアイテムの復元を追加します。ほかのサーバーで有効にしても問題ありません。"
     },
     "auth": {
       "title": "認証",
@@ -4498,6 +4510,11 @@
       "show_time_in_month_view_desc": "月カレンダー表示でイベントの時刻を表示する",
       "tinted_events": "淡いイベントカラー",
       "tinted_events_desc": "予定を塗りつぶしではなく、Outlook や印刷時と同じように、カレンダーの色の淡い色合いと先頭の色付きバーで表示します。",
+      "month_timed_events": "月表示での時刻付きの予定",
+      "month_timed_events_desc": "月表示で開始時刻のある予定をどう表示するか。終日の予定と複数日の予定はバーのままです。",
+      "month_timed_events_bar": "バー",
+      "month_timed_events_text": "色付きテキスト",
+      "month_timed_events_dot": "点とテキスト",
       "show_week_numbers": "週番号を表示",
       "show_week_numbers_desc": "ミニカレンダーに週番号を表示する",
       "calendar_free_scroll": "自由スクロール",
@@ -5042,7 +5059,6 @@
     "settings_ascending": "昇順",
     "settings_descending": "降順",
     "disabled_title": "ファイル機能は管理者によって無効にされています",
-    "disabled_description": "WebDAV経由の大容量ファイルアップロードは、メモリ不足クラッシュや回復不能なディスク使用量など、Stalwart/RocksDBの不安定性を引き起こす可能性があります。削除されたファイルはストレージからすぐに削除されない場合があります。この機能は本番環境では推奨されません。",
     "no_accounts": "接続されているアカウントはありません。",
     "open_folder_tree": "フォルダーツリーを開く",
     "migration_title": "ファイルを更新しています…",
@@ -5396,7 +5412,7 @@
   },
   "pwa_install": {
     "title": "{appName} をインストール",
-    "description": "素早いアクセスとオフライン対応のため、アプリをインストールしましょう。",
+    "description": "素早くアクセスできるよう、アプリをインストールしましょう。",
     "not_now": "後で",
     "install": "インストール",
     "dont_remind": "今後表示しない",

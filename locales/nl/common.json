@@ -1,5 +1,5 @@
 {
-  "meta_description": "Minimalistische webmailclient die het JMAP-protocol gebruikt",
+  "meta_description": "Zelf gehoste webmail voor e-mail, agenda, contacten en bestanden, gebouwd op JMAP",
   "login": {
     "title": "Webmail",
     "username_label": "E-mail",
@@ -473,6 +473,9 @@
     "source_truncated": "De eerste {size} worden getoond. Exporteer het bericht voor de rest.",
     "source_copied": "Bron gekopieerd naar klembord",
     "attachments": "Bijlagen",
+    "attachments_count": "{count, plural, one {# bijlage} other {# bijlagen}}",
+    "attachments_show_more": "Nog {count} tonen",
+    "attachments_show_fewer": "Minder tonen",
     "important": "Belangrijk",
     "download": "Downloaden",
     "download_all": "Alles downloaden",
@@ -1503,7 +1506,7 @@
       },
       "unified_mailbox": {
         "label": "Gecombineerd postvak",
-        "description": "Gecombineerde mappen (Postvak IN, Verzonden, enz.) van alle verbonden accounts weergeven",
+        "description": "Gecombineerde mappen (Postvak IN, Verzonden, enz.) tonen voor het actieve account en zijn gedeelde mappen. Het onderdeel verschijnt alleen als er iets te combineren valt: samenvoegen over alle accounts staat aan en er is meer dan één account verbonden, hieronder is een groepspostvak meegenomen, of Alle e-mail, Ongelezen of Met ster staat aan. Die drie zijn aparte opties die pas verschijnen als je beheerder ze aanzet.",
         "cross_account": {
           "label": "Across all accounts",
           "description": "Merge the unified mailbox across every connected account instead of staying within the active account."
@@ -1538,6 +1541,10 @@
       "show_shared_mail_accounts": {
         "label": "Gedeelde mailaccounts tonen",
         "description": "Toon de mappen van postvakken die met je zijn gedeeld onder Gedeeld in de zijbalk. Zet uit om ze allemaal te verbergen, of verberg hieronder losse accounts. Hun agenda's en contacten blijven zichtbaar."
+      },
+      "compact_shared_mailboxes": {
+        "label": "Compacte gedeelde postvakken",
+        "description": "Toon elk gedeeld postvak als één regel die het Postvak IN opent, met de mappen eronder. Lege mappen zoals Concepten of Prullenbak worden weggelaten."
       },
       "pro_interface": {
         "label": "Pro-interface (experimenteel)",
@@ -1896,8 +1903,8 @@
       "attachment_position": {
         "label": "Positie van bijlagen",
         "description": "Waar bijlagen in de e-mailkop worden weergegeven",
-        "beside-sender": "Naast de afzender",
-        "below-header": "Onder de kop"
+        "below-header": "Onder de kop",
+        "below-message": "Kaarten onder het bericht"
       },
       "emails_per_page": {
         "10": "10 e-mails",
@@ -2582,7 +2589,9 @@
       "group_by_letter_description": "Toon alfabetische sectiekoppen in de contactenlijst",
       "group_by_letter_label": "Groeperen op eerste letter",
       "sort_by_last_name_label": "Sorteren op achternaam",
-      "sort_by_last_name_description": "Sorteer de contactenlijst op achternaam zodat gezinsleden bij elkaar staan"
+      "sort_by_last_name_description": "Sorteer de contactenlijst op achternaam zodat gezinsleden bij elkaar staan",
+      "show_directory_label": "Adresboek van de organisatie tonen",
+      "show_directory_description": "Toon de accounts en groepen op de mailserver onder \"Adresboek van de organisatie\" in Contacten"
     },
     "calendar_management": {
       "delete_title": "Agenda verwijderen?",
@@ -2673,6 +2682,7 @@
       "include_spam": "Ook berichten verplaatsen die als spam zijn gemarkeerd",
       "attachment_type_placeholder": "bijv. pdf, doc, jpg",
       "value_placeholder_multi": "Waarde (meerdere met komma's gescheiden)",
+      "regex_placeholder": "Reguliere expressie, bijv. ^Cron|mailman",
       "condition_fields": {
         "attachment": "Bijlage",
         "from": "Van",
@@ -2694,6 +2704,7 @@
         "starts_with": "begint met",
         "ends_with": "eindigt met",
         "matches": "komt overeen met patroon",
+        "regex": "komt overeen met reguliere expressie",
         "greater_than": "is groter dan",
         "less_than": "is kleiner dan",
         "address_is": "is het adres",
@@ -2756,6 +2767,7 @@
       "validation_action_forward": "Vul een adres in om naar door te sturen",
       "validation_action_reject": "Vul het afwijzingsbericht in",
       "validation_header_name": "Headernamen mogen alleen de letters A-Z, cijfers, koppeltekens en underscores bevatten",
+      "validation_regex": "Deze reguliere expressie is ongeldig",
       "templates_section": "Starten vanuit sjabloon",
       "template_newsletters": "Nieuwsbrieven naar map verplaatsen",
       "template_receipts": "Bonnen automatisch archiveren",
@@ -3353,7 +3365,7 @@
       "row_url_required": "Server #{index}: de URL is verplicht",
       "row_url_scheme": "Server #{index}: de URL moet beginnen met http:// of https://",
       "stalwart": "Stalwart-specifieke functies inschakelen",
-      "stalwart_hint": "Voegt wachtwoord wijzigen en het beheer van Sieve-filters toe. Kan zonder risico ook bij andere servers aan."
+      "stalwart_hint": "Voegt de pagina Beveiliging (wachtwoord, tweestapsverificatie en app-wachtwoorden) en het herstellen van verwijderde items toe. Kan zonder risico ook bij andere servers aan."
     },
     "auth": {
       "title": "Aanmelden",
@@ -4498,6 +4510,11 @@
       "show_time_in_month_view_desc": "Evenementtijden weergeven in de maandkalenderweergave",
       "tinted_events": "Lichte afspraakkleuren",
       "tinted_events_desc": "Toon afspraken als een lichte tint van hun agendakleur met een gekleurde balk aan het begin, zoals in Outlook en op afdrukken, in plaats van volle blokken.",
+      "month_timed_events": "Afspraken met tijd in maandweergave",
+      "month_timed_events_desc": "Hoe afspraken met een begintijd eruitzien in de maandweergave. Afspraken voor de hele dag en meerdaagse afspraken blijven balken.",
+      "month_timed_events_bar": "Balk",
+      "month_timed_events_text": "Gekleurde tekst",
+      "month_timed_events_dot": "Stip en tekst",
       "show_week_numbers": "Weeknummers weergeven",
       "show_week_numbers_desc": "Weeknummers weergeven in de minikalender",
       "calendar_free_scroll": "Vrij scrollen",
@@ -5042,7 +5059,6 @@
     "settings_ascending": "Oplopend",
     "settings_descending": "Aflopend",
     "disabled_title": "De bestandsfunctie is uitgeschakeld door uw beheerder",
-    "disabled_description": "Grote bestandsuploads via WebDAV kunnen Stalwart/RocksDB-instabiliteit veroorzaken, waaronder geheugenfouten en onherstelbaar schijfgebruik. Verwijderde bestanden worden mogelijk niet onmiddellijk uit de opslag verwijderd. Deze functie wordt niet aanbevolen voor productieomgevingen.",
     "no_accounts": "Geen gekoppelde accounts.",
     "open_folder_tree": "Mappenstructuur openen",
     "migration_title": "Je bestanden worden bijgewerkt…",
@@ -5396,7 +5412,7 @@
   },
   "pwa_install": {
     "title": "{appName} installeren",
-    "description": "Installeer onze app voor snelle toegang en offline-ondersteuning.",
+    "description": "Installeer onze app voor snelle toegang.",
     "not_now": "Niet nu",
     "install": "Installeren",
     "dont_remind": "Niet meer herinneren",

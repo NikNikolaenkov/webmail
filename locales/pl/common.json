@@ -1,5 +1,5 @@
 {
-  "meta_description": "Minimalistyczny klient poczty internetowej wykorzystujący protokół JMAP",
+  "meta_description": "Samodzielnie hostowana poczta internetowa z pocztą, kalendarzem, kontaktami i plikami, oparta na JMAP",
   "login": {
     "title": "Webmail",
     "username_label": "E-mail",
@@ -473,6 +473,9 @@
     "source_truncated": "Wyświetlono pierwsze {size}. Wyeksportuj wiadomość, aby zobaczyć resztę.",
     "source_copied": "Źródło skopiowane do schowka",
     "attachments": "Załączniki",
+    "attachments_count": "{count, plural, one {# załącznik} few {# załączniki} many {# załączników} other {# załącznika}}",
+    "attachments_show_more": "Pokaż {count} więcej",
+    "attachments_show_fewer": "Pokaż mniej",
     "important": "Ważne",
     "download": "Pobierz",
     "download_all": "Pobierz wszystkie",
@@ -1503,7 +1506,7 @@
       },
       "unified_mailbox": {
         "label": "Wspólna skrzynka",
-        "description": "Wyświetlaj połączone foldery (Odebrane, Wysłane itp.) ze wszystkich połączonych kont",
+        "description": "Wyświetlaj połączone foldery (Odebrane, Wysłane itp.) aktywnego konta i jego udostępnionych folderów. Sekcja pojawia się tylko wtedy, gdy jest co połączyć: włączone jest łączenie wszystkich kont i połączono więcej niż jedno konto, poniżej uwzględniono skrzynkę grupową albo włączono Całą pocztę, Nieprzeczytane lub Oznaczone gwiazdką. Te trzy to osobne opcje, które pojawiają się dopiero wtedy, gdy włączy je administrator.",
         "cross_account": {
           "label": "Across all accounts",
           "description": "Merge the unified mailbox across every connected account instead of staying within the active account."
@@ -1538,6 +1541,10 @@
       "show_shared_mail_accounts": {
         "label": "Pokaż udostępnione konta pocztowe",
         "description": "Pokazuj foldery skrzynek udostępnionych Ci w sekcji Udostępnione na pasku bocznym. Wyłącz, aby ukryć wszystkie, lub ukryj poszczególne konta poniżej. Ich kalendarze i kontakty pozostaną."
+      },
+      "compact_shared_mailboxes": {
+        "label": "Kompaktowe udostępnione skrzynki",
+        "description": "Pokazuj każdą udostępnioną skrzynkę jako jeden wiersz, który otwiera jej Odebrane, z folderami pod spodem. Puste foldery, takie jak Szkice czy Kosz, są pomijane."
       },
       "pro_interface": {
         "label": "Interfejs Pro (eksperymentalny)",
@@ -1896,8 +1903,8 @@
       "attachment_position": {
         "label": "Pozycja załączników",
         "description": "Gdzie wyświetlać załączniki w nagłówku wiadomości e-mail",
-        "beside-sender": "Obok nadawcy",
-        "below-header": "Pod nagłówkiem"
+        "below-header": "Pod nagłówkiem",
+        "below-message": "Karty pod wiadomością"
       },
       "emails_per_page": {
         "10": "10 wiadomości",
@@ -2582,7 +2589,9 @@
       "group_by_letter_description": "Pokaż alfabetyczne nagłówki sekcji na liście kontaktów",
       "group_by_letter_label": "Grupuj według pierwszej litery",
       "sort_by_last_name_label": "Sortuj według nazwiska",
-      "sort_by_last_name_description": "Uporządkuj listę kontaktów według nazwiska, aby członkowie rodziny byli obok siebie"
+      "sort_by_last_name_description": "Uporządkuj listę kontaktów według nazwiska, aby członkowie rodziny byli obok siebie",
+      "show_directory_label": "Pokaż katalog",
+      "show_directory_description": "Wyświetla konta i grupy z serwera poczty w sekcji „Katalog” w Kontaktach"
     },
     "calendar_management": {
       "delete_title": "Usunąć kalendarz?",
@@ -2673,6 +2682,7 @@
       "include_spam": "Przenoś również wiadomości oznaczone jako spam",
       "attachment_type_placeholder": "np. pdf, doc, jpg",
       "value_placeholder_multi": "Wartość (kilka oddzielonych przecinkami)",
+      "regex_placeholder": "Wyrażenie regularne, np. ^Cron|mailman",
       "condition_fields": {
         "attachment": "Załącznik",
         "from": "Od",
@@ -2694,6 +2704,7 @@
         "starts_with": "zaczyna się od",
         "ends_with": "kończy się na",
         "matches": "pasuje do wzorca",
+        "regex": "pasuje do wyrażenia regularnego",
         "greater_than": "jest większe niż",
         "less_than": "jest mniejsze niż",
         "address_is": "to adres",
@@ -2756,6 +2767,7 @@
       "validation_action_forward": "Wpisz adres, na który przekazywać",
       "validation_action_reject": "Wpisz wiadomość odrzucenia",
       "validation_header_name": "Nazwy nagłówków mogą zawierać tylko litery A-Z, cyfry, łączniki i podkreślenia",
+      "validation_regex": "To wyrażenie regularne jest nieprawidłowe",
       "templates_section": "Rozpocznij od szablonu",
       "template_newsletters": "Przenieś newslettery do folderu",
       "template_receipts": "Automatycznie archiwizuj rachunki",
@@ -3353,7 +3365,7 @@
       "row_url_required": "Serwer nr {index}: adres URL jest wymagany",
       "row_url_scheme": "Serwer nr {index}: adres URL musi zaczynać się od http:// lub https://",
       "stalwart": "Włącz funkcje specyficzne dla Stalwart",
-      "stalwart_hint": "Dodaje zmianę hasła i zarządzanie filtrami Sieve. Można bezpiecznie włączyć także na innych serwerach."
+      "stalwart_hint": "Dodaje stronę Bezpieczeństwo (hasło, uwierzytelnianie dwuskładnikowe i hasła aplikacji) oraz odzyskiwanie usuniętych elementów. Można bezpiecznie włączyć także na innych serwerach."
     },
     "auth": {
       "title": "Uwierzytelnianie",
@@ -4498,6 +4510,11 @@
       "show_time_in_month_view_desc": "Wyświetlaj godziny wydarzeń w miesięcznym widoku kalendarza",
       "tinted_events": "Jasne kolory wydarzeń",
       "tinted_events_desc": "Pokazuj wydarzenia w jasnym odcieniu koloru kalendarza z kolorowym paskiem na początku, jak w Outlooku i na wydruku, zamiast pełnych bloków.",
+      "month_timed_events": "Wydarzenia z godziną w widoku miesiąca",
+      "month_timed_events_desc": "Jak wyglądają w widoku miesiąca wydarzenia z godziną rozpoczęcia. Wydarzenia całodniowe i wielodniowe pozostają paskami.",
+      "month_timed_events_bar": "Pasek",
+      "month_timed_events_text": "Kolorowy tekst",
+      "month_timed_events_dot": "Kropka i tekst",
       "show_week_numbers": "Pokaż numery tygodni",
       "show_week_numbers_desc": "Wyświetlaj numery tygodni w mini-kalendarzu",
       "calendar_free_scroll": "Swobodne przewijanie",
@@ -5042,7 +5059,6 @@
     "settings_ascending": "Rosnąco",
     "settings_descending": "Malejąco",
     "disabled_title": "Funkcja Pliki jest wyłączona przez administratora",
-    "disabled_description": "Duże przesyłanie plików przez WebDAV może powodować niestabilność Stalwart/RocksDB, w tym awarie z powodu braku pamięci i nieodwracalne zużycie miejsca na dysku. Usunięte pliki mogą nie zostać natychmiast usunięte z magazynu blob. Ta funkcja nie jest zalecana w środowiskach produkcyjnych.",
     "no_accounts": "Brak połączonych kont.",
     "open_folder_tree": "Otwórz drzewo folderów",
     "migration_title": "Aktualizowanie plików…",
@@ -5396,7 +5412,7 @@
   },
   "pwa_install": {
     "title": "Zainstaluj {appName}",
-    "description": "Zainstaluj naszą aplikację, aby uzyskać szybki dostęp i obsługę offline.",
+    "description": "Zainstaluj naszą aplikację, aby uzyskać szybki dostęp.",
     "not_now": "Nie teraz",
     "install": "Zainstaluj",
     "dont_remind": "Nie przypominaj mi więcej",

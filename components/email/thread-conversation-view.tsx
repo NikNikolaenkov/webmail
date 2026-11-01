@@ -18,6 +18,7 @@ import { attachmentIcon } from "./attachment-chips";
 import { ExternalSenderChip } from "./external-sender-chip";
 import { collectReferencedCids, isEmbeddedInBody, isReportPart, normalizeCid, rewriteCidReferences } from "@/lib/attachment-visibility";
 import { collapsePlainTextQuotes, setupQuoteCollapse } from "@/lib/quote-collapse";
+import { measureEmailFrameHeight } from "@/lib/email-frame-height";
 import { fitEmailBodyWidth } from "@/lib/email-fit-width";
 import { mailLanguage } from "@/lib/mail-language";
 import { htmlToReadableText } from "@/lib/html-to-readable-text";
@@ -65,7 +66,7 @@ import { useDeviceDetection } from "@/hooks/use-media-query";
 import { usePluginRenderedBody } from "@/hooks/use-plugin-rendered-body";
 import { emailToReadView } from "@/lib/plugin-projection";
 import { AttachmentPluginMenu, ReaderAboveQuoteSlot } from "./reader-plugin-surfaces";
-import { useNoThirdPartyTraffic } from "@/hooks/use-third-party-mode";
+import { useRemoteContentBlockedByOrg } from "@/hooks/use-third-party-mode";
 import { ConversationHeaderActions, type ConversationActions } from "./conversation-header-actions";
 
 export type ConversationAttachmentHandler = (
@@ -106,8 +107,9 @@ export function useConversationExternalContent() {
   const addToTrustedSendersBook = useContactStore((state) => state.addToTrustedSendersBook);
   const { client } = useAuthStore(useShallow((state) => ({ client: state.client })));
   const [allowedIds, setAllowedIds] = useState<Set<string>>(new Set());
-  // No third-party traffic (#903): nothing remote loads and nothing offers to.
-  const remoteBlockedByOrg = useNoThirdPartyTraffic();
+  // No third-party traffic (#903), or the organisation locked "block":
+  // nothing remote loads and nothing offers to.
+  const remoteBlockedByOrg = useRemoteContentBlockedByOrg();
 
   const allow = useCallback((emailId: string) => {
     setAllowedIds(prev => new Set(prev).add(emailId));
@@ -541,7 +543,7 @@ export function ConversationEmailBody({
   bodyStyle,
   className,
 }: ConversationEmailBodyProps) {
-  const remoteBlockedByOrg = useNoThirdPartyTraffic();
+  const remoteBlockedByOrg = useRemoteContentBlockedByOrg();
   const t = useTranslations();
   const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
   const mailAttachmentAction = useSettingsStore((state) => state.mailAttachmentAction);
@@ -851,8 +853,7 @@ export function ConversationEmailBody({
         // leaves the layout height untouched, so scale the box by hand.
         // Phones always; any screen with "Fit wide mail" on.
         const scale = fitEmailBodyWidth(doc, reading.fitWidth ? mailFitOptions(true, true) : {});
-        const height = Math.max(doc.documentElement.scrollHeight, doc.body.scrollHeight);
-        iframe.style.height = Math.ceil(height * scale) + 'px';
+        iframe.style.height = Math.ceil(measureEmailFrameHeight(doc) * scale) + 'px';
       };
       resize();
       const ro = new ResizeObserver(resize);

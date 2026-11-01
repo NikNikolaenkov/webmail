@@ -40,7 +40,7 @@ export const OUTGOING_HOSTS: readonly OutgoingHost[] = [
     files: ['lib/telemetry/types.ts'],
     side: 'server',
     usedBy: 'Anonymous daily heartbeat, sent only after an admin turned telemetry on.',
-    off: 'Off by default. BULWARK_TELEMETRY=off, or Admin > Telemetry.',
+    off: 'Off by default. BULWARK_TELEMETRY=off, or System > Usage stats (switch it off or clear the collector URL).',
     inMode: 'Never sent, whatever the telemetry setting says.',
     lite: false,
   },
@@ -51,7 +51,7 @@ export const OUTGOING_HOSTS: readonly OutgoingHost[] = [
     side: 'server',
     usedBy: 'Hourly check for a newer Bulwark release, shown to admins.',
     off: 'BULWARK_UPDATE_CHECK=off, or BULWARK_UPDATE_CHECK_URL= (empty).',
-    inMode: 'Not checked; Admin > Version says why. Checks resume when the switch goes off.',
+    inMode: 'Not checked; System > Updates says why. Checks resume when the switch goes off.',
     lite: false,
   },
   {
@@ -77,7 +77,7 @@ export const OUTGOING_HOSTS: readonly OutgoingHost[] = [
   {
     id: 'connector',
     host: 'connector.bulwarkmail.org',
-    files: ['lib/admin/types.ts', 'lib/connector/registry.ts'],
+    files: ['lib/connector/registry.ts'],
     side: 'server',
     usedBy: 'Links in the docs and the directory that open this instance; the connector asks this server what it can open.',
     off: 'CONNECTOR_ENABLED=false.',
@@ -157,7 +157,7 @@ export const OUTGOING_HOSTS: readonly OutgoingHost[] = [
  * has to be looked at again.
  */
 export const NON_REQUEST_HOSTS: readonly { host: string; files: readonly string[]; why: string }[] = [
-  { host: 'bulwarkmail.org', why: 'docs links and comments', files: ['app/(main)/admin/_pages/telemetry.tsx', 'components/admin/org/sections/recovery-section.tsx', 'instrumentation.node.ts', 'lib/telemetry/state.ts', 'lib/telemetry/types.ts'] },
+  { host: 'bulwarkmail.org', why: 'docs links, comments and the contact URL in User-Agent headers', files: ['app/(main)/admin/_pages/telemetry.tsx', 'app/api/fetch-ical/route.ts', 'app/api/translate/route.ts','components/admin/org/sections/recovery-section.tsx', 'instrumentation.node.ts', 'lib/telemetry/state.ts', 'lib/telemetry/types.ts'] },
   { host: 'bulwarkmail.com', why: 'JMAP capability URI', files: ['lib/jmap/client.ts'] },
   { host: 'extensions.bulwarkmail.org', why: 'signed statement type URIs', files: ['lib/admin/directory-keys.ts'] },
   { host: 'www.w3.org', why: 'XML namespaces', files: ['components/ui/flag-icons.tsx', 'lib/favicon-badge.ts'] },

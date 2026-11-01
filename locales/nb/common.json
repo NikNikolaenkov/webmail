@@ -1,5 +1,5 @@
 {
-  "meta_description": "Minimalistisk nettpostklient som bruker JMAP-protokollen",
+  "meta_description": "Selvhostet nettpost for e-post, kalender, kontakter og filer, bygget på JMAP",
   "login": {
     "title": "Nettpost",
     "username_label": "E-post",
@@ -473,6 +473,9 @@
     "source_truncated": "Viser de første {size}. Eksporter meldingen for resten.",
     "source_copied": "Meldingskilden er kopiert til utklippstavlen",
     "attachments": "Vedlegg",
+    "attachments_count": "{count, plural, one {# vedlegg} other {# vedlegg}}",
+    "attachments_show_more": "Vis {count} til",
+    "attachments_show_fewer": "Vis færre",
     "important": "Viktig",
     "download": "Last ned",
     "download_all": "Last ned alle",
@@ -1506,7 +1509,7 @@
       },
       "unified_mailbox": {
         "label": "Samlet postkasse",
-        "description": "Vis kombinerte mapper (innboks, sendt osv.) for den aktive kontoen og dens delte mapper.",
+        "description": "Vis kombinerte mapper (innboks, sendt osv.) for den aktive kontoen og dens delte mapper. Delen vises bare når det er noe å kombinere: «På tvers av alle kontoer» er på og mer enn én konto er tilkoblet, en gruppeinnboks er tatt med nedenfor, eller All e-post, Ulest eller Stjernemerket er på. Disse tre er egne valg som bare vises når administratoren slår dem på.",
         "cross_account": {
           "label": "På tvers av alle kontoer",
           "description": "Slå sammen den samlede postkassen på tvers av alle tilkoblede kontoer, i stedet for å begrense den til den aktive kontoen."
@@ -1541,6 +1544,10 @@
       "show_shared_mail_accounts": {
         "label": "Vis delte e-postkontoer",
         "description": "Vis mappene fra postbokser som er delt med deg under Delt i sidepanelet. Slå av for å skjule alle, eller skjul enkeltkontoer nedenfor. Kalendere og kontakter blir værende."
+      },
+      "compact_shared_mailboxes": {
+        "label": "Kompakte delte postbokser",
+        "description": "Vis hver delte postboks som én rad som åpner innboksen, med mappene under. Tomme mapper som Utkast eller Papirkurv utelates."
       },
       "pro_interface": {
         "label": "Pro-grensesnitt (eksperimentelt)",
@@ -1899,8 +1906,8 @@
       "attachment_position": {
         "label": "Plassering av vedlegg",
         "description": "Velg hvor vedlegg skal vises i e-postoverskriften",
-        "beside-sender": "Ved siden av avsender",
-        "below-header": "Under overskriften"
+        "below-header": "Under overskriften",
+        "below-message": "Kort under meldingen"
       },
       "emails_per_page": {
         "10": "10 e-poster",
@@ -2579,6 +2586,8 @@
       "group_by_letter_label": "Grupper etter første bokstav",
       "sort_by_last_name_label": "Sorter etter etternavn",
       "sort_by_last_name_description": "Sorter kontaktlisten etter etternavn slik at familiemedlemmer står samlet",
+      "show_directory_label": "Vis katalogen",
+      "show_directory_description": "Vis kontoene og gruppene på e-postserveren under «Katalog» i Kontakter",
       "group_by_letter_description": "Vis alfabetiske overskrifter i kontaktlisten",
       "import_label": "Importer kontakter",
       "import_description": "Importer kontakter fra en vCard-fil (.vcf).",
@@ -2680,6 +2689,7 @@
       "include_spam": "Flytt også meldinger som er merket som søppelpost",
       "attachment_type_placeholder": "f.eks. pdf, doc, jpg",
       "value_placeholder_multi": "Verdi (skill flere verdier med komma)",
+      "regex_placeholder": "Regulært uttrykk, f.eks. ^Cron|mailman",
       "condition_fields": {
         "attachment": "Vedlegg",
         "from": "Fra",
@@ -2701,6 +2711,7 @@
         "starts_with": "starter med",
         "ends_with": "slutter med",
         "matches": "samsvarer med mønsteret",
+        "regex": "samsvarer med regulært uttrykk",
         "greater_than": "er større enn",
         "less_than": "er mindre enn",
         "address_is": "er adressen",
@@ -2763,6 +2774,7 @@
       "validation_action_forward": "Skriv inn en adresse det skal videresendes til",
       "validation_action_reject": "Skriv inn avvisningsmeldingen",
       "validation_header_name": "Navn på meldingshoder kan bare inneholde bokstavene A-Z, sifre, bindestreker og understreker",
+      "validation_regex": "Dette regulære uttrykket er ugyldig",
       "templates_section": "Start med en mal",
       "template_newsletters": "Flytt nyhetsbrev til mappe",
       "template_receipts": "Arkiver kvitteringer automatisk",
@@ -3353,7 +3365,7 @@
       "row_url_required": "Server nr. {index}: URL-en er påkrevd",
       "row_url_scheme": "Server nr. {index}: URL-en må begynne med http:// eller https://",
       "stalwart": "Slå på Stalwart-spesifikke funksjoner",
-      "stalwart_hint": "Legger til endring av passord og administrasjon av Sieve-filtre. Trygt å slå på også for andre servere."
+      "stalwart_hint": "Legger til siden Sikkerhet (passord, tofaktorautentisering og app-passord) og gjenoppretting av slettede elementer. Trygt å slå på også for andre servere."
     },
     "auth": {
       "title": "Autentisering",
@@ -4498,6 +4510,11 @@
       "show_time_in_month_view_desc": "Vis klokkeslettet for hendelser i månedsvisningen. På små skjermer vises hele hendelsesoppføringen i stedet for en prikk.",
       "tinted_events": "Lyse hendelsesfarger",
       "tinted_events_desc": "Vis hendelser i en lys nyanse av kalenderens farge med en farget stolpe i starten, som i Outlook og på utskrifter, i stedet for fylte blokker.",
+      "month_timed_events": "Hendelser med klokkeslett i månedsvisning",
+      "month_timed_events_desc": "Hvordan hendelser med starttidspunkt vises i månedsvisningen. Heldags- og flerdagshendelser forblir stolper.",
+      "month_timed_events_bar": "Stolpe",
+      "month_timed_events_text": "Farget tekst",
+      "month_timed_events_dot": "Prikk og tekst",
       "show_week_numbers": "Vis ukenummer",
       "show_week_numbers_desc": "Vis ukenummer i minikalenderen",
       "calendar_free_scroll": "Fri rulling",
@@ -5174,7 +5191,6 @@
     "settings_ascending": "Stigende",
     "settings_descending": "Synkende",
     "disabled_title": "Administratoren har deaktivert filfunksjonen",
-    "disabled_description": "Store filopplastinger via WebDAV kan føre til ustabilitet i Stalwart/RocksDB, blant annet krasj på grunn av for lite minne og diskplass som ikke blir frigjort. Slettede filer kan ikke fjernes umiddelbart fra blob-lagringen. Denne funksjonen anbefales ikke for produksjonsmiljøer.",
     "migration_title": "Oppdaterer filene dine...",
     "migration_description": "Mapper og filer organiseres i riktig struktur. Dette skjer bare én gang.",
     "new": "Ny",
@@ -5396,7 +5412,7 @@
   },
   "pwa_install": {
     "title": "Installer {appName}",
-    "description": "Installer appen for rask tilgang og støtte for bruk uten nett.",
+    "description": "Installer appen for rask tilgang.",
     "not_now": "Ikke nå",
     "install": "Installer",
     "dont_remind": "Ikke minn meg på det igjen",

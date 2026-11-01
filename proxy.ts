@@ -15,6 +15,7 @@ import { listReachableHosts, noThirdPartyCspSources } from "./lib/admin/reachabl
 import { getWopiEditorOrigins } from "./lib/wopi/discovery";
 import { detectSetupState } from "./lib/setup/state";
 import { isServedOverHttps } from "./lib/security/request-protocol";
+import { bootGateResponse } from "./lib/shared-store/boot-gate";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -67,9 +68,14 @@ const PROXY_SKIP_PATTERN = /^\/(?:api|_next)(?:\/|$)/;
  * path; the proxy is skipped only when both are one of these exactly.
  * next.config.ts gives them the headers the proxy would have set.
  * A literal: Next reads it at build time.
+ *
+ * The bare "/" entry is for sub-path installs: Next glues the base path in
+ * front of each source, so the second pattern only matches /webmail/... and
+ * never /webmail itself. That request then skipped the locale redirect and
+ * ended on a 404 (#1455).
  */
 export const config = {
-  matcher: ["/((?!api/webdav$|api/plugin-proxy$|api/wopi/files/[^/]+/contents$).*)"],
+  matcher: ["/", "/((?!api/webdav$|api/plugin-proxy$|api/wopi/files/[^/]+/contents$).*)"],
 };
 
 // What Next serves from public/: a single dotted segment at the root
@@ -181,7 +187,31 @@ function isSetupPath(pathname: string): boolean {
   );
 }
 
+/**
+ * A redirect to `pathname` (without the base path) on the origin of
+ * request.url. Not request.nextUrl: Next renames a 127.x or [::1] host there
+ * to "localhost", and with skipProxyUrlNormalize (next.config.ts) Next no
+ * longer turns that back into a relative Location. On HOSTNAME=127.0.0.1 the
+ * browser would be sent to https://localhost:3000/... (#1487).
+ */
+function redirectTo(request: NextRequest, pathname: string, search: string): NextResponse {
+  return NextResponse.redirect(new URL(`${request.nextUrl.basePath}${pathname}${search}`, request.url));
+}
+
 export async function proxy(request: NextRequest) {
+  // The probes answer without config or store, so a replica that is still
+  // starting (or lost its shared store) can say so (#1066).
+  const probePath = routePathOf(request.nextUrl.pathname);
+  if (probePath === "/api/health" || probePath === "/api/ready") {
+    const probe = NextResponse.next();
+    probe.headers.set("X-Content-Type-Options", "nosniff");
+    probe.headers.set("X-Frame-Options", "DENY");
+    return probe;
+  }
+  // With a shared store, nothing else is served until boot finished.
+  const notReady = bootGateResponse(probePath);
+  if (notReady) return notReady;
+
   // Resolve setup state before deciding what to skip. The first call after
   // boot triggers the config load; subsequent calls are in-memory.
   await configManager.ensureLoaded();
@@ -212,10 +242,7 @@ export async function proxy(request: NextRequest) {
           { status: 503, headers: { "content-type": "application/json" } },
         );
       }
-      const url = request.nextUrl.clone();
-      url.pathname = "/setup";
-      url.search = request.nextUrl.search;
-      return NextResponse.redirect(url);
+      return redirectTo(request, "/setup", request.nextUrl.search);
     }
   } else if (isSetupPath(pathname)) {
     // Configured / env-managed: wizard is no longer reachable.
@@ -225,10 +252,7 @@ export async function proxy(request: NextRequest) {
     if (pathname.startsWith("/api/setup")) {
       return new NextResponse("Not Found", { status: 404 });
     }
-    const url = request.nextUrl.clone();
-    url.pathname = "/admin/login";
-    url.search = "";
-    return NextResponse.redirect(url);
+    return redirectTo(request, "/admin/login", "");
   }
 
   // Outer CSRF gate for every API route (GHSA-qvr9-m8cq-7wvg,

@@ -44,6 +44,9 @@ import { parseAuthenticationResults } from "@/lib/email-headers";
 import { IS_LITE_STALWART } from "@/lib/lite";
 import { toStorageQuota, type JMAPQuota, type StorageQuota } from "@/lib/quota";
 import { messagePriorityHeaders, type MessagePriority } from "@/lib/message-priority";
+import { customHeaderProperties } from "@/lib/outgoing/custom-headers";
+import { attachmentParts, HTML_PART_ID, relatedBodyStructure, TEXT_PART_ID, type OutgoingBodyPart } from "./outgoing-body";
+import { addBodyMediaToAttachments } from "./body-media-attachments";
 
 // Cap for the follow-up Email/get issued when a displayed body part comes
 // back truncated at the normal 256000-byte limit (see refetchTruncatedBodyValues
@@ -1419,6 +1422,8 @@ export interface SubmissionSendOptions {
   requireTls?: boolean;
   /** Importance / X-Priority headers (#970); see lib/message-priority.ts. */
   priority?: MessagePriority;
+  /** Extra headers plugins added; see lib/outgoing/custom-headers.ts. */
+  headers?: Record<string, string>;
   /** The account the replaced draft (`draftId`) lives in; default the primary. */
   draftAccountId?: string;
 }
@@ -1645,15 +1650,17 @@ export class JMAPClient implements IJMAPClient {
         ["Email/get", {
           accountId: targetAccountId,
           ids: batchIds,
-          properties: ["id", "attachments"],
+          // The body lists come from the same parse as attachments and cost
+          // nothing more; they hold Apple Mail's inline pictures (#1478).
+          properties: ["id", "attachments", "textBody", "htmlBody"],
           bodyProperties: [...LIST_ATTACHMENT_BODY_PROPERTIES],
         }, "0"],
       ]);
       if (response.methodResponses?.[0]?.[0] !== "Email/get") {
         throw new Error("Email/get for list attachments failed");
       }
-      const list = (response.methodResponses[0][1]?.list || []) as Pick<Email, "id" | "attachments">[];
-      for (const email of list) result.set(email.id, email.attachments ?? []);
+      const list = (response.methodResponses[0][1]?.list || []) as Pick<Email, "id" | "attachments" | "textBody" | "htmlBody">[];
+      for (const email of list) result.set(email.id, addBodyMediaToAttachments(email).attachments ?? []);
     }
     return result;
   }
@@ -2984,6 +2991,7 @@ export class JMAPClient implements IJMAPClient {
       }
 
       await this.refetchTruncatedBodyValues([email], targetAccountId);
+      addBodyMediaToAttachments(email);
 
       if (email.headers) {
         await this.parseEmailHeaders(email);
@@ -4466,6 +4474,7 @@ export class JMAPClient implements IJMAPClient {
         // to avoid an N+1 request pattern on threads with several oversized
         // messages (#884).
         await this.refetchTruncatedBodyValues(emails, targetAccountId);
+        for (const email of emails) addBodyMediaToAttachments(email);
 
         if (accountId && accountId !== this.accountId) {
           namespaceMailboxIds(emails, accountId);
@@ -4703,9 +4712,10 @@ export class JMAPClient implements IJMAPClient {
       keywords: Record<string, boolean>;
       mailboxIds: Record<string, boolean>;
       bodyValues: Record<string, { value: string }>;
-      textBody: { partId: string; type?: string }[];
+      textBody?: { partId: string; type?: string }[];
       htmlBody?: { partId: string; type: string }[];
-      attachments?: { blobId: string; type: string; name: string; disposition: string; cid?: string }[];
+      attachments?: OutgoingBodyPart[];
+      bodyStructure?: OutgoingBodyPart;
       inReplyTo?: string[];
       references?: string[];
       [header: `header:${string}`]: string;
@@ -4740,14 +4750,15 @@ export class JMAPClient implements IJMAPClient {
       ...messagePriorityHeaders(options?.priority),
     };
 
-    if (attachments?.length) {
-      emailData.attachments = attachments.map(att => ({
-        blobId: att.blobId,
-        type: att.type,
-        name: att.name,
-        disposition: att.disposition ?? "attachment",
-        ...(att.cid ? { cid: att.cid } : {}),
-      }));
+    // Images the HTML shows by cid: go into a multipart/related beside it
+    // (#1451), so the draft and the mail sent from it display them.
+    const draftStructure = relatedBodyStructure(htmlBody, attachments);
+    if (draftStructure) {
+      delete emailData.textBody;
+      delete emailData.htmlBody;
+      emailData.bodyStructure = draftStructure;
+    } else if (attachments?.length) {
+      emailData.attachments = attachmentParts(attachments);
     }
 
     // Destroy the previous draft version only AFTER the replacement was
@@ -4940,28 +4951,34 @@ export class JMAPClient implements IJMAPClient {
     }
 
     Object.assign(emailCreate, messagePriorityHeaders(options?.priority));
+    Object.assign(emailCreate, customHeaderProperties(options?.headers));
 
-    if (htmlBody) {
-      // Send as multipart/alternative with both text and HTML
+    // Images the HTML shows by cid: go into a multipart/related beside it,
+    // or recipients don't see them (#1451).
+    const sendStructure = relatedBodyStructure(htmlBody, attachments);
+    if (sendStructure) {
       emailCreate.bodyValues = {
-        "text": { value: body },
-        "html": { value: htmlBody },
+        [TEXT_PART_ID]: { value: body },
+        [HTML_PART_ID]: { value: htmlBody },
       };
-      emailCreate.textBody = [{ partId: "text", type: "text/plain" }];
-      emailCreate.htmlBody = [{ partId: "html", type: "text/html" }];
+      emailCreate.bodyStructure = sendStructure;
     } else {
-      emailCreate.bodyValues = { "1": { value: body } };
-      emailCreate.textBody = [{ partId: "1", type: "text/plain" }];
-    }
+      if (htmlBody) {
+        // Send as multipart/alternative with both text and HTML
+        emailCreate.bodyValues = {
+          "text": { value: body },
+          "html": { value: htmlBody },
+        };
+        emailCreate.textBody = [{ partId: "text", type: "text/plain" }];
+        emailCreate.htmlBody = [{ partId: "html", type: "text/html" }];
+      } else {
+        emailCreate.bodyValues = { "1": { value: body } };
+        emailCreate.textBody = [{ partId: "1", type: "text/plain" }];
+      }
 
-    if (attachments?.length) {
-      emailCreate.attachments = attachments.map(att => ({
-        blobId: att.blobId,
-        type: att.type,
-        name: att.name,
-        disposition: att.disposition ?? "attachment",
-        ...(att.cid ? { cid: att.cid } : {}),
-      }));
+      if (attachments?.length) {
+        emailCreate.attachments = attachmentParts(attachments);
+      }
     }
 
     const methodCalls: JMAPMethodCall[] = [];
@@ -5228,8 +5245,8 @@ export class JMAPClient implements IJMAPClient {
     // who doesn't.
     const rejectedRecipientsResult = rejected.length ? rejected : undefined;
     return delayedUntil
-      ? { scheduled: true, emailId: createdEmailId, emailSubmissionId, sendAt: serverSendAt, submissionAccountId, filingError, rejectedRecipients: rejectedRecipientsResult }
-      : { scheduled: false, emailId: createdEmailId, emailSubmissionId, submissionAccountId, filingError, rejectedRecipients: rejectedRecipientsResult };
+      ? { scheduled: true, emailId: createdEmailId, emailAccountId: targetAccountId, emailSubmissionId, sendAt: serverSendAt, submissionAccountId, filingError, rejectedRecipients: rejectedRecipientsResult }
+      : { scheduled: false, emailId: createdEmailId, emailAccountId: targetAccountId, emailSubmissionId, submissionAccountId, filingError, rejectedRecipients: rejectedRecipientsResult };
   }
 
   /**
@@ -5301,7 +5318,7 @@ export class JMAPClient implements IJMAPClient {
 
     const lines: string[] = [
       'BEGIN:VCALENDAR',
-      'PRODID:-//JMAP-Webmail//EN',
+      'PRODID:-//Bulwark Mail//Bulwark Webmail//EN',
       'VERSION:2.0',
       'CALSCALE:GREGORIAN',
       'METHOD:REPLY',
@@ -5490,7 +5507,7 @@ export class JMAPClient implements IJMAPClient {
 
     const lines: string[] = [
       'BEGIN:VCALENDAR',
-      'PRODID:-//JMAP-Webmail//EN',
+      'PRODID:-//Bulwark Mail//Bulwark Webmail//EN',
       'VERSION:2.0',
       'CALSCALE:GREGORIAN',
       'METHOD:REQUEST',
@@ -5668,7 +5685,7 @@ export class JMAPClient implements IJMAPClient {
 
     const lines: string[] = [
       'BEGIN:VCALENDAR',
-      'PRODID:-//JMAP-Webmail//EN',
+      'PRODID:-//Bulwark Mail//Bulwark Webmail//EN',
       'VERSION:2.0',
       'CALSCALE:GREGORIAN',
       'METHOD:CANCEL',
@@ -5798,34 +5815,68 @@ export class JMAPClient implements IJMAPClient {
       xhr.setRequestHeader('Authorization', this.authHeader);
       xhr.responseType = 'text';
 
-      const onAbort = () => xhr.abort();
-      if (signal) signal.addEventListener('abort', onAbort, { once: true });
-      const cleanup = () => signal?.removeEventListener('abort', onAbort);
-
-      if (onProgress) {
-        // Fire 0% immediately so the UI leaves its initial state even
-        // before the first network packet flushes.
-        onProgress(0, file.size);
-        xhr.upload.onprogress = (ev) => {
-          // ev.total is only meaningful when lengthComputable; fall back
-          // to file.size so callers always get a usable denominator.
-          const total = ev.lengthComputable ? ev.total : file.size;
-          onProgress(ev.loaded, total);
-        };
-      }
-
-      xhr.onload = () => {
+      let settled = false;
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      let uploaded = 0;
+      const cleanup = () => {
+        clearTimeout(timer);
+        signal?.removeEventListener('abort', onAbort);
+        xhr.onload = xhr.onerror = xhr.onabort = xhr.ontimeout = null;
+        xhr.upload.onprogress = null;
+      };
+      const settle = (complete: () => void): boolean => {
+        if (settled) return false;
+        settled = true;
         cleanup();
+        complete();
+        return true;
+      };
+      const abortWith = (error: Error) => {
+        // Settle first: abort() may synchronously dispatch an abort event.
+        if (settle(() => reject(error))) xhr.abort();
+      };
+      const onAbort = () => abortWith(new DOMException('Upload aborted', 'AbortError'));
+      const onTimeout = () => abortWith(new RequestTimeoutError(JMAPClient.TRANSFER_TIMEOUT_MS));
+      const resetWatchdog = () => {
+        clearTimeout(timer);
+        // XHR uses this budget for inactivity, unlike fetch's deadline until
+        // response headers. Additional upload bytes renew it; after 100% it
+        // stays armed while waiting for the terminal response.
+        timer = setTimeout(onTimeout, JMAPClient.TRANSFER_TIMEOUT_MS);
+      };
+
+      xhr.upload.onprogress = (ev) => {
+        if (settled) return;
+        if (ev.loaded > uploaded) {
+          uploaded = ev.loaded;
+          resetWatchdog();
+        }
+        // ev.total is only meaningful when lengthComputable; fall back
+        // to file.size so callers always get a usable denominator.
+        onProgress?.(ev.loaded, ev.lengthComputable ? ev.total : file.size);
+      };
+      xhr.onload = () => settle(() => {
         if (xhr.status >= 200 && xhr.status < 300) {
           resolve(xhr.responseText);
         } else {
           reject(new Error(`Failed to upload file: ${xhr.status} - ${xhr.responseText}`));
         }
-      };
-      xhr.onerror = () => { cleanup(); reject(new Error('Upload network error')); };
-      xhr.onabort = () => { cleanup(); reject(new DOMException('Upload aborted', 'AbortError')); };
+      });
+      xhr.onerror = () => settle(() => reject(new Error('Upload network error')));
+      xhr.onabort = () => settle(() => reject(new DOMException('Upload aborted', 'AbortError')));
+      xhr.ontimeout = onTimeout;
 
-      xhr.send(file);
+      try {
+        signal?.addEventListener('abort', onAbort, { once: true });
+        // Fire 0% immediately so the UI leaves its initial state even
+        // before the first network packet flushes.
+        onProgress?.(0, file.size);
+        if (settled) return;
+        resetWatchdog();
+        xhr.send(file);
+      } catch (error) {
+        settle(() => reject(error));
+      }
     });
   }
 
@@ -8476,6 +8527,19 @@ export class JMAPClient implements IJMAPClient {
   // for why the fan-out has to probe on suspicion).
   private calendarAccessDenied = new Set<string>();
 
+  /**
+   * Whether `error` from a calendar call to the shared account `accountId`
+   * means it grants no calendar access; if so, it is remembered and skipped
+   * from now on. Any failure of the user's own calendars is the caller's.
+   */
+  private deniesCalendarAccess(accountId: string, error: unknown): boolean {
+    if (accountId === this.getCalendarsAccountId()) return false;
+    if (!isCalendarAccessDenial(jmapErrorType(error), error instanceof Error ? error.message : undefined)) return false;
+    this.calendarAccessDenied.add(accountId);
+    debug.log('calendar', `No calendar access to account ${accountId} - skipping it from now on`);
+    return true;
+  }
+
   // Result of the one-off synthetic-id capability probe, shared by every
   // range query on this client (see supportsSyntheticCalendarIds).
   private syntheticCalendarIdSupport: Promise<boolean> | null = null;
@@ -8655,12 +8719,7 @@ export class JMAPClient implements IJMAPClient {
       // calendar access at all. Remember the rejection and go quiet instead
       // of re-probing - and re-logging - on every range change. Anything
       // else, and any failure of the user's own calendars, is the caller's.
-      const denied = isCalendarAccessDenial(jmapErrorType(error), error instanceof Error ? error.message : undefined);
-      if (targetAccountId && accountId !== this.getCalendarsAccountId() && denied) {
-        this.calendarAccessDenied.add(targetAccountId);
-        debug.log('calendar', `No calendar access to account ${targetAccountId} - skipping it from now on`);
-        return [];
-      }
+      if (targetAccountId && this.deniesCalendarAccess(accountId, error)) return [];
       throw error;
     }
   }
@@ -9397,10 +9456,14 @@ export class JMAPClient implements IJMAPClient {
       debug.groupEnd();
       return tasks;
     } catch (error) {
-      // A refused query or get is a failure, not an empty task list: the
-      // task store keeps showing what it has.
-      debug.error('CalendarTask/fetch failed', error);
+      // A shared account probed on suspicion (see queryCalendarEvents) that
+      // grants no calendar access has no tasks. Any other refused query or
+      // get is a failure, not an empty task list: the task store keeps
+      // showing what it has.
+      const denied = this.deniesCalendarAccess(accountId, error);
+      if (!denied) debug.error('CalendarTask/fetch failed', error);
       debug.groupEnd();
+      if (denied) return [];
       throw error;
     }
   }
@@ -11254,8 +11317,8 @@ export class JMAPClient implements IJMAPClient {
 
     const rejectedRecipientsResult = rejected.length ? rejected : undefined;
     return delayedUntil
-      ? { scheduled: true, emailId, emailSubmissionId, sendAt: serverSendAt, submissionAccountId, isSmime: true, rejectedRecipients: rejectedRecipientsResult }
-      : { scheduled: false, emailId, emailSubmissionId, submissionAccountId, isSmime: true, rejectedRecipients: rejectedRecipientsResult };
+      ? { scheduled: true, emailId, emailAccountId: this.accountId, emailSubmissionId, sendAt: serverSendAt, submissionAccountId, isSmime: true, rejectedRecipients: rejectedRecipientsResult }
+      : { scheduled: false, emailId, emailAccountId: this.accountId, emailSubmissionId, submissionAccountId, isSmime: true, rejectedRecipients: rejectedRecipientsResult };
   }
 
   /**
@@ -11533,6 +11596,7 @@ export class JMAPClient implements IJMAPClient {
       ]);
       const fetchedEmails = (emailResponse.methodResponses?.[0]?.[1]?.list ?? []) as Email[];
       await this.refetchTruncatedBodyValues(fetchedEmails, accountId);
+      for (const email of fetchedEmails) addBodyMediaToAttachments(email);
       emailsByAccount.set(accountId, new Map(fetchedEmails.map(email => [email.id, email])));
     }
     const emails = pageSubmissions

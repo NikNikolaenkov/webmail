@@ -49,8 +49,18 @@ if (isLite && (process.env.NEXT_PUBLIC_LOCALE_PREFIX ?? "never") !== "always") {
 
 const nextConfig: NextConfig = {
   output: isLite ? "export" : "standalone",
-  // No `X-Powered-By: Next.js` on every response.
+  // No `X-Powered-By: Next.js`; headers() below sends
+  // `X-Powered-By: bulwarkmail.org` instead, without a version.
   poweredByHeader: false,
+  // Keep proxy rewrites on the origin the server listens on. Next renames a
+  // 127.x or [::1] host to "localhost" in each proxy rewrite, but its router
+  // compares the rewrite with the listen address. On HOSTNAME=127.0.0.1 every
+  // locale rewrite then looked external and was proxied back to the server
+  // itself, over TLS when X-Forwarded-Proto said https: EPROTO and a 500
+  // behind a reverse proxy (#1046, #1487, vercel/next.js#94745). With this set,
+  // request.url is the URL the router built; proxy.ts builds its redirects
+  // from it as well.
+  skipProxyUrlNormalize: true,
   // Directory-style pages (out/en/mail/index.html) are what static hosts and
   // the shipped SPA-fallback rules expect; next/image has no optimizer here.
   ...(isLite ? { trailingSlash: true, images: { unoptimized: true } } : {}),
@@ -59,8 +69,10 @@ const nextConfig: NextConfig = {
   basePath: basePath || undefined,
   // esbuild ships native binaries + a README the bundler can't parse; load
   // it from node_modules at runtime instead of trying to bundle it. Used by
-  // PLUGIN_DEV_DIR's on-the-fly bundler.
-  serverExternalPackages: ["esbuild"],
+  // PLUGIN_DEV_DIR's on-the-fly bundler. ioredis (the shared store, #1066)
+  // is loaded from node_modules too, so the proxy and the route bundles
+  // don't each carry a copy.
+  serverExternalPackages: ["esbuild", "ioredis"],
   // The build's type check leaves out tests, which are a third of the files
   // and push tsc past the default heap on a 4 GB machine (#1431).
   // `npm run typecheck` still checks them with tsconfig.json.
@@ -77,6 +89,12 @@ const nextConfig: NextConfig = {
     : {
         async headers() {
           return [
+            {
+              // Lets people see a site runs Bulwark. No version, so it tells
+              // a scanner nothing about which fixes are missing.
+              source: "/:path*",
+              headers: [{ key: "X-Powered-By", value: "bulwarkmail.org" }],
+            },
             {
               // Untrusted plugin iframes have opaque origins and load these public,
               // immutable chunks in CORS mode. Next prefixes this source with basePath.

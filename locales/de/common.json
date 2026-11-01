@@ -1,5 +1,5 @@
 {
-  "meta_description": "Minimalistischer Webmail-Client mit JMAP-Protokoll",
+  "meta_description": "Selbst gehostete Webmail für E-Mail, Kalender, Kontakte und Dateien, basierend auf JMAP",
   "login": {
     "title": "Webmail",
     "username_label": "E-Mail",
@@ -473,6 +473,9 @@
     "source_truncated": "Angezeigt werden die ersten {size}. Exportieren Sie die Nachricht für den Rest.",
     "source_copied": "Quelltext in Zwischenablage kopiert",
     "attachments": "Anhänge",
+    "attachments_count": "{count, plural, one {# Anhang} other {# Anhänge}}",
+    "attachments_show_more": "{count} weitere anzeigen",
+    "attachments_show_fewer": "Weniger anzeigen",
     "important": "Wichtig",
     "download": "Herunterladen",
     "download_all": "Alle herunterladen",
@@ -1503,7 +1506,7 @@
       },
       "unified_mailbox": {
         "label": "Gemeinsames Postfach",
-        "description": "Kombinierte Ordner (Posteingang, Gesendet usw.) für alle verbundenen Konten anzeigen",
+        "description": "Kombinierte Ordner (Posteingang, Gesendet usw.) für das aktive Konto und seine geteilten Ordner anzeigen. Der Bereich erscheint erst, wenn es etwas zu kombinieren gibt: „Über alle Konten“ ist an und mehr als ein Konto verbunden, unten ist ein Gruppenpostfach einbezogen, oder Alle Mails, Ungelesen oder Markiert ist an. Diese drei sind eigene Optionen, die erst erscheinen, wenn die Administration sie freischaltet.",
         "cross_account": {
           "label": "Über alle Konten",
           "description": "Den vereinheitlichten Posteingang über alle verbundenen Konten zusammenführen, statt beim aktiven Konto zu bleiben."
@@ -1538,6 +1541,10 @@
       "show_shared_mail_accounts": {
         "label": "Geteilte E-Mail-Konten anzeigen",
         "description": "Die Ordner von Postfächern, die mit Ihnen geteilt wurden, in der Seitenleiste unter „Geteilt“ anzeigen. Ausschalten, um alle auszublenden, oder einzelne Konten unten ausblenden. Kalender und Kontakte bleiben sichtbar."
+      },
+      "compact_shared_mailboxes": {
+        "label": "Geteilte Postfächer kompakt",
+        "description": "Jedes geteilte Postfach als eine Zeile anzeigen, die seinen Posteingang öffnet, mit seinen Ordnern darunter. Leere wie Entwürfe oder Papierkorb werden ausgelassen."
       },
       "pro_interface": {
         "label": "Pro-Oberfläche (experimentell)",
@@ -1895,9 +1902,9 @@
       },
       "attachment_position": {
         "label": "Anhangsposition",
-        "description": "Wo Anhänge im E-Mail-Header angezeigt werden",
-        "beside-sender": "Neben dem Absender",
-        "below-header": "Unter dem Header"
+        "description": "Wo die Anhänge einer geöffneten E-Mail angezeigt werden",
+        "below-header": "Als Leiste unter dem Header",
+        "below-message": "Als Karten unter der Nachricht"
       },
       "emails_per_page": {
         "10": "10 E-Mails",
@@ -2582,7 +2589,9 @@
       "group_by_letter_description": "Alphabetische Abschnittsüberschriften in der Kontaktliste anzeigen",
       "group_by_letter_label": "Nach Anfangsbuchstaben gruppieren",
       "sort_by_last_name_label": "Nach Nachname sortieren",
-      "sort_by_last_name_description": "Kontaktliste nach Nachnamen ordnen, damit Familienmitglieder zusammenstehen"
+      "sort_by_last_name_description": "Kontaktliste nach Nachnamen ordnen, damit Familienmitglieder zusammenstehen",
+      "show_directory_label": "Verzeichnis anzeigen",
+      "show_directory_description": "Zeigt die Konten und Gruppen auf dem Mailserver unter „Verzeichnis“ in den Kontakten"
     },
     "calendar_management": {
       "delete_title": "Kalender löschen?",
@@ -2673,6 +2682,7 @@
       "include_spam": "Auch als Spam markierte Nachrichten verschieben",
       "attachment_type_placeholder": "z.B. pdf, doc, jpg",
       "value_placeholder_multi": "Wert (mehrere mit Komma trennen)",
+      "regex_placeholder": "Regulärer Ausdruck, z. B. ^Cron|mailman",
       "condition_fields": {
         "attachment": "Anhang",
         "from": "Von",
@@ -2694,6 +2704,7 @@
         "starts_with": "beginnt mit",
         "ends_with": "endet mit",
         "matches": "entspricht dem Muster",
+        "regex": "passt zum regulären Ausdruck",
         "greater_than": "ist größer als",
         "less_than": "ist kleiner als",
         "address_is": "ist die Adresse",
@@ -2756,6 +2767,7 @@
       "validation_action_forward": "Geben Sie eine Adresse zum Weiterleiten ein",
       "validation_action_reject": "Geben Sie die Ablehnungsnachricht ein",
       "validation_header_name": "Header-Namen dürfen nur die Buchstaben A-Z, Ziffern, Bindestriche und Unterstriche enthalten",
+      "validation_regex": "Dieser reguläre Ausdruck ist ungültig",
       "templates_section": "Von Vorlage starten",
       "template_newsletters": "Newsletter in Ordner verschieben",
       "template_receipts": "Quittungen automatisch archivieren",
@@ -3353,7 +3365,7 @@
       "row_url_required": "Server #{index}: Die URL ist erforderlich",
       "row_url_scheme": "Server #{index}: Die URL muss mit http:// oder https:// beginnen",
       "stalwart": "Stalwart-spezifische Funktionen aktivieren",
-      "stalwart_hint": "Fügt Passwortänderung und die Verwaltung von Sieve-Filtern hinzu. Kann auch bei anderen Servern bedenkenlos aktiviert werden."
+      "stalwart_hint": "Fügt die Seite Sicherheit (Passwort, Zwei-Faktor-Anmeldung und App-Passwörter) und das Wiederherstellen gelöschter Elemente hinzu. Kann auch bei anderen Servern bedenkenlos aktiviert werden."
     },
     "auth": {
       "title": "Anmeldung",
@@ -4498,6 +4510,11 @@
       "show_time_in_month_view_desc": "Ereigniszeiten in der Monatskalenderansicht anzeigen",
       "tinted_events": "Helle Terminfarben",
       "tinted_events_desc": "Termine als helle Tönung ihrer Kalenderfarbe mit farbigem Balken am Anfang anzeigen, wie in Outlook und im Ausdruck, statt als volle Farbflächen.",
+      "month_timed_events": "Termine mit Uhrzeit in der Monatsansicht",
+      "month_timed_events_desc": "So erscheinen Termine mit Startzeit in der Monatsansicht. Ganztägige und mehrtägige Termine bleiben Balken.",
+      "month_timed_events_bar": "Balken",
+      "month_timed_events_text": "Farbiger Text",
+      "month_timed_events_dot": "Punkt und Text",
       "show_week_numbers": "Kalenderwochen anzeigen",
       "show_week_numbers_desc": "Kalenderwochen im Minikalender anzeigen",
       "calendar_free_scroll": "Freies Scrollen",
@@ -5042,7 +5059,6 @@
     "settings_ascending": "Aufsteigend",
     "settings_descending": "Absteigend",
     "disabled_title": "Die Dateifunktion wurde von Ihrem Administrator deaktiviert",
-    "disabled_description": "Große Datei-Uploads über WebDAV können Stalwart/RocksDB-Instabilität verursachen, einschließlich Out-of-Memory-Abstürzen und nicht wiederherstellbarer Festplattennutzung. Gelöschte Dateien werden möglicherweise nicht sofort aus dem Blob-Speicher entfernt. Diese Funktion wird für Produktionsumgebungen nicht empfohlen.",
     "no_accounts": "Keine verbundenen Konten.",
     "open_folder_tree": "Ordnerbaum öffnen",
     "migration_title": "Ihre Dateien werden aktualisiert…",
@@ -5396,7 +5412,7 @@
   },
   "pwa_install": {
     "title": "{appName} installieren",
-    "description": "Installiere unsere App für schnellen Zugriff und Offline-Unterstützung.",
+    "description": "Installiere unsere App für schnellen Zugriff.",
     "not_now": "Nicht jetzt",
     "install": "Installieren",
     "dont_remind": "Nicht mehr erinnern",

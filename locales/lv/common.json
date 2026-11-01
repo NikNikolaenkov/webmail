@@ -1,5 +1,5 @@
 {
-  "meta_description": "Minimālistisks tīmekļa pasta klients, kas izmanto JMAP protokolu",
+  "meta_description": "Pašmitināms tīmekļa pasts e-pastam, kalendāram, kontaktiem un failiem, balstīts uz JMAP",
   "login": {
     "title": "Tīmekļa pasts",
     "username_label": "E-pasta adrese",
@@ -473,6 +473,9 @@
     "source_truncated": "Rāda pirmos {size}. Lai redzētu pārējo, eksportējiet vēstuli.",
     "source_copied": "Avota kods nokopēts starpliktuvē",
     "attachments": "Pielikumi",
+    "attachments_count": "{count, plural, zero {# pielikumu} one {# pielikums} other {# pielikumi}}",
+    "attachments_show_more": "Rādīt vēl {count}",
+    "attachments_show_fewer": "Rādīt mazāk",
     "important": "Svarīgi",
     "download": "Lejupielādēt",
     "download_all": "Lejupielādēt visu",
@@ -1503,7 +1506,7 @@
       },
       "unified_mailbox": {
         "label": "Apvienotā pastkaste",
-        "description": "Rādīt apvienotās mapes (Iesūtne, Nosūtītie u.c.) no visiem pievienotajiem kontiem",
+        "description": "Rādīt apvienotās mapes (Iesūtne, Nosūtītie u.c.) aktīvajam kontam un tā koplietotajām mapēm. Sadaļa parādās tikai tad, kad ir ko apvienot: ir ieslēgta visu kontu apvienošana un pievienots vairāk nekā viens konts, zemāk ir iekļauta grupas pastkaste, vai ir ieslēgtas Visas vēstules, Nelasītie vai Ar zvaigzni. Šīs trīs ir atsevišķas iespējas, kas parādās tikai pēc tam, kad tās ieslēdz administrators.",
         "cross_account": {
           "label": "Across all accounts",
           "description": "Merge the unified mailbox across every connected account instead of staying within the active account."
@@ -1538,6 +1541,10 @@
       "show_shared_mail_accounts": {
         "label": "Rādīt koplietotos pasta kontus",
         "description": "Rādīt ar jums koplietoto pastkastīšu mapes sānjoslā sadaļā Koplietots. Izslēdziet, lai paslēptu visas, vai paslēpiet atsevišķus kontus zemāk. To kalendāri un kontakti paliek redzami."
+      },
+      "compact_shared_mailboxes": {
+        "label": "Kompaktas koplietotās pastkastes",
+        "description": "Rādīt katru koplietoto pastkasti kā vienu rindu, kas atver tās iesūtni, ar tās mapēm zem tās. Tukšas mapes, piemēram, Melnraksti, netiek rādītas."
       },
       "pro_interface": {
         "label": "Pro saskarne (eksperimentāla)",
@@ -1896,8 +1903,8 @@
       "attachment_position": {
         "label": "Pielikumu novietojums",
         "description": "Kur rādīt pielikumus vēstules galvenē",
-        "beside-sender": "Blakus sūtītājam",
-        "below-header": "Zem galvenes"
+        "below-header": "Zem galvenes",
+        "below-message": "Kartītes zem ziņojuma"
       },
       "emails_per_page": {
         "10": "10 vēstules",
@@ -2582,7 +2589,9 @@
       "group_by_letter_description": "Rādīt alfabētiskos sadaļu virsrakstus kontaktu sarakstā",
       "group_by_letter_label": "Grupēt pēc pirmā burta",
       "sort_by_last_name_label": "Kārtot pēc uzvārda",
-      "sort_by_last_name_description": "Kārtot kontaktu sarakstu pēc uzvārda, lai ģimenes locekļi būtu kopā"
+      "sort_by_last_name_description": "Kārtot kontaktu sarakstu pēc uzvārda, lai ģimenes locekļi būtu kopā",
+      "show_directory_label": "Rādīt katalogu",
+      "show_directory_description": "Rādīt pasta servera kontus un grupas sadaļā “Katalogs” kontaktos"
     },
     "calendar_management": {
       "delete_title": "Dzēst kalendāru?",
@@ -2673,6 +2682,7 @@
       "include_spam": "Pārvietot arī ziņas, kas atzīmētas kā mēstules",
       "attachment_type_placeholder": "piem. pdf, doc, jpg",
       "value_placeholder_multi": "Vērtība (vairākas atdalītas ar komatu)",
+      "regex_placeholder": "Regulārā izteiksme, piem., ^Cron|mailman",
       "condition_fields": {
         "attachment": "Pielikums",
         "from": "No",
@@ -2694,6 +2704,7 @@
         "starts_with": "sākas ar",
         "ends_with": "beidzas ar",
         "matches": "atbilst paraugam",
+        "regex": "atbilst regulārajai izteiksmei",
         "greater_than": "lielāks nekā",
         "less_than": "mazāks nekā",
         "address_is": "ir adrese",
@@ -2756,6 +2767,7 @@
       "validation_action_forward": "Ievadiet adresi, uz kuru pārsūtīt",
       "validation_action_reject": "Ievadiet noraidīšanas ziņojumu",
       "validation_header_name": "Galvenes nosaukumā drīkst būt tikai burti A-Z, cipari, defises un pasvītras",
+      "validation_regex": "Šī regulārā izteiksme nav derīga",
       "templates_section": "Sākt no veidnes",
       "template_newsletters": "Pārvietot ziņu izdevumus uz mapi",
       "template_receipts": "Automātiski arhivēt rēķinus",
@@ -3353,7 +3365,7 @@
       "row_url_required": "Serveris Nr. {index}: URL ir obligāts",
       "row_url_scheme": "Serveris Nr. {index}: URL jāsākas ar http:// vai https://",
       "stalwart": "Iespējot Stalwart specifiskās funkcijas",
-      "stalwart_hint": "Pievieno paroles maiņu un Sieve filtru pārvaldību. Droši var iespējot arī citiem serveriem."
+      "stalwart_hint": "Pievieno lapu Drošība (parole, divfaktoru autentifikācija un lietotņu paroles) un dzēsto vienumu atjaunošanu. Droši var iespējot arī citiem serveriem."
     },
     "auth": {
       "title": "Autentifikācija",
@@ -4497,6 +4509,11 @@
       "show_time_in_month_view_desc": "Rādīt pasākuma laiku mēneša kalendārā",
       "tinted_events": "Gaišas notikumu krāsas",
       "tinted_events_desc": "Rādīt notikumus kalendāra krāsas gaišā tonī ar krāsainu joslu sākumā, kā Outlook un izdrukās, nevis kā pilnus blokus.",
+      "month_timed_events": "Notikumi ar laiku mēneša skatā",
+      "month_timed_events_desc": "Kā mēneša skatā izskatās notikumi ar sākuma laiku. Visas dienas un vairāku dienu notikumi paliek joslas.",
+      "month_timed_events_bar": "Josla",
+      "month_timed_events_text": "Krāsains teksts",
+      "month_timed_events_dot": "Punkts un teksts",
       "show_week_numbers": "Rādīt nedēļu numurus",
       "show_week_numbers_desc": "Rādīt nedēļu numurus mini kalendārā",
       "calendar_free_scroll": "Brīva ritināšana",
@@ -5042,7 +5059,6 @@
     "settings_ascending": "Augošā",
     "settings_descending": "Dilstošā",
     "disabled_title": "Failu funkciju ir atspējojis administrators",
-    "disabled_description": "Lielu failu augšupielāde, izmantojot WebDAV, var radīt Stalwart/RocksDB nestabilitāti, tostarp atmiņas izsīkumu un neatkopjamu diska izmantojumu. Dzēstie faili var netikt nekavējoties izņemti no blob glabātuves. Šī funkcija nav ieteicama produkcijas vidēm.",
     "no_accounts": "Nav pievienotu kontu.",
     "open_folder_tree": "Atvērt mapju koku",
     "migration_title": "Notiek jūsu failu atjaunināšana…",
@@ -5396,7 +5412,7 @@
   },
   "pwa_install": {
     "title": "Instalēt {appName}",
-    "description": "Instalējiet mūsu lietotni ātrai piekļuvei un bezsaistes atbalstam.",
+    "description": "Instalējiet mūsu lietotni ātrai piekļuvei.",
     "not_now": "Ne tagad",
     "install": "Instalēt",
     "dont_remind": "Vairs man neatgādināt",

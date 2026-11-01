@@ -1,7 +1,7 @@
 {
   "name": "bulwark-webmail",
   "version": "1.19.1",
-  "description": "Bulwark Webmail - a modern webmail client built for Stalwart Mail Server",
+  "description": "Bulwark Webmail: self-hosted webmail for mail, calendar, contacts and files, built on JMAP",
   "author": "Bulwark Mail <dev@bulwarkmail.org>",
   "license": "AGPL-3.0-only",
   "repository": {
@@ -65,6 +65,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
     "dompurify": "^3.4.12",
+    "ioredis": "^5.11.1",
     "jalaali-js": "^2.0.1",
     "jszip": "^3.10.2",
     "next": "^16.4.3",

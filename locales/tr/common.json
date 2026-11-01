@@ -1,5 +1,5 @@
 {
-  "meta_description": "JMAP protokolünü kullanan minimalist web posta istemcisi",
+  "meta_description": "E-posta, takvim, kişiler ve dosyalar için JMAP tabanlı, kendi sunucunuzda barındırılan web posta",
   "login": {
     "title": "Webmail",
     "username_label": "E-posta",
@@ -473,6 +473,9 @@
     "source_truncated": "İlk {size} gösteriliyor. Gerisi için iletiyi dışa aktarın.",
     "source_copied": "Kaynak panoya kopyalandı",
     "attachments": "Ekler",
+    "attachments_count": "{count, plural, one {# ek} other {# ek}}",
+    "attachments_show_more": "{count} tane daha göster",
+    "attachments_show_fewer": "Daha az göster",
     "important": "Önemli",
     "download": "İndir",
     "download_all": "Tümünü indir",
@@ -1503,7 +1506,7 @@
       },
       "unified_mailbox": {
         "label": "Birleşik Posta Kutusu",
-        "description": "Bağlı tüm hesaplardaki birleşik klasörleri (Gelen Kutusu, Gönderilenler vb.) göster",
+        "description": "Etkin hesabın ve paylaşılan klasörlerinin birleşik klasörlerini (Gelen Kutusu, Gönderilenler vb.) göster. Bölüm yalnızca birleştirilecek bir şey olduğunda görünür: tüm hesapları birleştirme açıksa ve birden fazla hesap bağlıysa, aşağıda bir grup gelen kutusu dahil edilmişse ya da Tüm postalar, Okunmamış veya Yıldızlı açıksa. Bu üçü ayrı seçeneklerdir ve yalnızca yöneticiniz açtıktan sonra görünür.",
         "cross_account": {
           "label": "Across all accounts",
           "description": "Merge the unified mailbox across every connected account instead of staying within the active account."
@@ -1538,6 +1541,10 @@
       "show_shared_mail_accounts": {
         "label": "Paylaşılan posta hesaplarını göster",
         "description": "Sizinle paylaşılan posta kutularının klasörlerini kenar çubuğunda Paylaşılan altında göster. Hepsini gizlemek için kapatın veya aşağıdan tek tek hesapları gizleyin. Takvimleri ve kişileri görünür kalır."
+      },
+      "compact_shared_mailboxes": {
+        "label": "Kompakt paylaşılan posta kutuları",
+        "description": "Her paylaşılan posta kutusunu, gelen kutusunu açan tek bir satır olarak ve klasörleri altında olacak şekilde göster. Taslaklar veya Çöp Kutusu gibi boş klasörler gösterilmez."
       },
       "pro_interface": {
         "label": "Pro Arayüz (Deneysel)",
@@ -1896,8 +1903,8 @@
       "attachment_position": {
         "label": "Ek Konumu",
         "description": "E-posta başlığında eklerin nerede görüntüleneceği",
-        "beside-sender": "Göndericinin yanı",
-        "below-header": "Başlığın altı"
+        "below-header": "Başlığın altı",
+        "below-message": "Mesajın altında kartlar"
       },
       "emails_per_page": {
         "10": "10 e-posta",
@@ -2572,6 +2579,8 @@
       "group_by_letter_label": "İlk harfe göre grupla",
       "sort_by_last_name_label": "Soyada göre sırala",
       "sort_by_last_name_description": "Aile üyeleri bir arada görünsün diye kişi listesini soyada göre sıralar",
+      "show_directory_label": "Dizini göster",
+      "show_directory_description": "Posta sunucusundaki hesapları ve grupları Kişiler altında \"Dizin\" bölümünde listeler",
       "group_by_letter_description": "Kişi listesinde alfabetik bölüm başlıkları göster",
       "import_label": "Kişileri İçe Aktar",
       "import_description": "Kişileri bir vCard (.vcf) dosyasından içe aktarın",
@@ -2673,6 +2682,7 @@
       "include_spam": "İstenmeyen olarak işaretlenen iletileri de taşı",
       "attachment_type_placeholder": "örn. pdf, doc, jpg",
       "value_placeholder_multi": "Değer (birden fazla virgülle ayrılır)",
+      "regex_placeholder": "Normal ifade, ör. ^Cron|mailman",
       "condition_fields": {
         "attachment": "Ek",
         "from": "Kimden",
@@ -2694,6 +2704,7 @@
         "starts_with": "ile başlar",
         "ends_with": "ile biter",
         "matches": "desenle eşleşir",
+        "regex": "normal ifadeyle eşleşir",
         "greater_than": "büyüktür",
         "less_than": "küçüktür",
         "address_is": "adresi şudur",
@@ -2756,6 +2767,7 @@
       "validation_action_forward": "İletilecek bir adres girin",
       "validation_action_reject": "Ret mesajını girin",
       "validation_header_name": "Başlık adları yalnızca A-Z harflerini, rakamları, kısa çizgileri ve alt çizgileri içerebilir",
+      "validation_regex": "Bu normal ifade geçerli değil",
       "templates_section": "Şablondan başla",
       "template_newsletters": "Bültenleri klasöre taşı",
       "template_receipts": "Makbuzları otomatik arşivle",
@@ -3353,7 +3365,7 @@
       "row_url_required": "Sunucu {index}: URL gerekli",
       "row_url_scheme": "Sunucu {index}: URL http:// veya https:// ile başlamalı",
       "stalwart": "Stalwart’a özel özellikleri etkinleştir",
-      "stalwart_hint": "Parola değiştirme ve Sieve filtre yönetimi ekler. Diğer sunucularda da güvenle etkinleştirilebilir."
+      "stalwart_hint": "Güvenlik sayfasını (parola, iki adımlı doğrulama ve uygulama parolaları) ve silinen öğeleri kurtarmayı ekler. Diğer sunucularda da güvenle etkinleştirilebilir."
     },
     "auth": {
       "title": "Kimlik doğrulama",
@@ -4498,6 +4510,11 @@
       "show_time_in_month_view_desc": "Aylık takvim görünümünde etkinlik saatlerini görüntüle",
       "tinted_events": "Açık etkinlik renkleri",
       "tinted_events_desc": "Etkinlikleri düz bloklar yerine, Outlook'ta ve çıktılarda olduğu gibi takvim renginin açık bir tonu ve başta renkli bir çubukla göster.",
+      "month_timed_events": "Ay görünümünde saatli etkinlikler",
+      "month_timed_events_desc": "Başlangıç saati olan etkinliklerin ay görünümünde nasıl göründüğü. Tüm gün ve çok günlük etkinlikler çubuk olarak kalır.",
+      "month_timed_events_bar": "Çubuk",
+      "month_timed_events_text": "Renkli metin",
+      "month_timed_events_dot": "Nokta ve metin",
       "show_week_numbers": "Hafta numaralarını göster",
       "show_week_numbers_desc": "Mini takvimde hafta numaralarını görüntüle",
       "calendar_free_scroll": "Serbest kaydırma",
@@ -5172,7 +5189,6 @@
     "settings_ascending": "Artan",
     "settings_descending": "Azalan",
     "disabled_title": "Dosyalar özelliği yöneticiniz tarafından devre dışı bırakıldı",
-    "disabled_description": "WebDAV üzerinden büyük dosya yüklemeleri Stalwart/RocksDB kararsızlığına yol açabilir; bellek yetersizliği çöküşleri ve kurtarılamaz disk kullanımı dahil. Silinen dosyalar blob depolamadan hemen temizlenmeyebilir. Bu özellik üretim ortamları için önerilmez.",
     "no_accounts": "Bağlı hesap yok.",
     "open_folder_tree": "Klasör ağacını aç",
     "migration_title": "Dosyalarınız güncelleniyor…",
@@ -5396,7 +5412,7 @@
   },
   "pwa_install": {
     "title": "{appName} uygulamasını yükle",
-    "description": "Hızlı erişim ve çevrimdışı destek için uygulamamızı yükleyin.",
+    "description": "Hızlı erişim için uygulamamızı yükleyin.",
     "not_now": "Şimdi değil",
     "install": "Yükle",
     "dont_remind": "Bir daha hatırlatma",

@@ -1,5 +1,5 @@
 {
-  "meta_description": "Minimalistlik JMAP-protokolli kasutav veebipostiklient",
+  "meta_description": "Isehostitav veebipost e-kirjade, kalendri, kontaktide ja failide jaoks, põhineb JMAP-il",
   "login": {
     "title": "Veebipost",
     "username_label": "E-post",
@@ -473,6 +473,9 @@
     "source_truncated": "Kuvatakse esimesed {size}. Ülejäänu nägemiseks eksportige kiri.",
     "source_copied": "Lähtekood kopeeritud lõikelauale",
     "attachments": "Manused",
+    "attachments_count": "{count, plural, one {# manus} other {# manust}}",
+    "attachments_show_more": "Näita veel {count}",
+    "attachments_show_fewer": "Näita vähem",
     "important": "Oluline",
     "download": "Laadi alla",
     "download_all": "Laadi kõik alla",
@@ -1506,7 +1509,7 @@
       },
       "unified_mailbox": {
         "label": "Ühendatud postkast",
-        "description": "Kuva aktiivse konto ja selle jagatud kaustade ühendatud kaustad (Saabunud, Saadetud jne).",
+        "description": "Kuva aktiivse konto ja selle jagatud kaustade ühendatud kaustad (Saabunud, Saadetud jne). Jaotis ilmub ainult siis, kui on midagi ühendada: „Kõigi kontode ulatuses“ on sees ja ühendatud on rohkem kui üks konto, allpool on kaasatud rühma postkast või Kõik kirjad, Lugemata või Tärniga on sees. Need kolm on eraldi valikud, mis ilmuvad alles siis, kui administraator need sisse lülitab.",
         "cross_account": {
           "label": "Kõigi kontode ulatuses",
           "description": "Ühenda ühendatud postkast kõigi lisatud kontode ulatuses, mitte ainult aktiivse konto piires."
@@ -1541,6 +1544,10 @@
       "show_shared_mail_accounts": {
         "label": "Näita jagatud meilikontosid",
         "description": "Näita sinuga jagatud postkastide kaustu külgribal jaotises Jagatud. Lülita välja, et peita kõik, või peida allpool üksikud kontod. Nende kalendrid ja kontaktid jäävad alles."
+      },
+      "compact_shared_mailboxes": {
+        "label": "Kompaktsed jagatud postkastid",
+        "description": "Näita iga jagatud postkasti ühe reana, mis avab selle saabunud kirjad, kaustad selle all. Tühjad kaustad, nagu Mustandid või Prügikast, jäetakse välja."
       },
       "pro_interface": {
         "label": "Pro liides (eksperimentaalne)",
@@ -1899,8 +1906,8 @@
       "attachment_position": {
         "label": "Manuse asukoht",
         "description": "Kuhu kuvada manused kirja päises",
-        "beside-sender": "Saatja kõrval",
-        "below-header": "Päise all"
+        "below-header": "Päise all",
+        "below-message": "Kaardid kirja all"
       },
       "emails_per_page": {
         "10": "10 kirja",
@@ -2580,6 +2587,8 @@
       "group_by_letter_description": "Näita kontaktide loendis tähestikulisi jaotisepealkirju",
       "sort_by_last_name_label": "Sordi perekonnanime järgi",
       "sort_by_last_name_description": "Järjesta kontaktide loend perekonnanime järgi, et pereliikmed oleksid koos",
+      "show_directory_label": "Näita kataloogi",
+      "show_directory_description": "Näita meiliserveri kontosid ja rühmi Kontaktide all jaotises „Kataloog“",
       "import_label": "Impordi kontaktid",
       "import_description": "Impordi kontaktid vCard (.vcf) failist",
       "export_label": "Ekspordi kontaktid",
@@ -2680,6 +2689,7 @@
       "include_spam": "Liiguta ka rämpspostiks märgitud kirjad",
       "attachment_type_placeholder": "nt pdf, doc, jpg",
       "value_placeholder_multi": "Väärtus (mitu, komadega eraldatud)",
+      "regex_placeholder": "Regulaaravaldis, nt ^Cron|mailman",
       "condition_fields": {
         "attachment": "Manus",
         "from": "Saatja",
@@ -2701,6 +2711,7 @@
         "starts_with": "algab",
         "ends_with": "lõpeb",
         "matches": "vastab mustrile",
+        "regex": "vastab regulaaravaldisele",
         "greater_than": "on suurem kui",
         "less_than": "on väiksem kui",
         "address_is": "on aadress",
@@ -2763,6 +2774,7 @@
       "validation_action_forward": "Sisesta aadress, kuhu edasi saata",
       "validation_action_reject": "Sisesta tagasilükkamise sõnum",
       "validation_header_name": "Päise nimes võivad olla ainult tähed A-Z, numbrid, sidekriipsud ja allkriipsud",
+      "validation_regex": "See regulaaravaldis ei ole kehtiv",
       "templates_section": "Alusta mallist",
       "template_newsletters": "Liiguta uudiskirjad kausta",
       "template_receipts": "Arhiveeri kviitungid automaatselt",
@@ -3353,7 +3365,7 @@
       "row_url_required": "Server nr {index}: URL on kohustuslik",
       "row_url_scheme": "Server nr {index}: URL peab algama http:// või https://",
       "stalwart": "Luba Stalwarti-põhised funktsioonid",
-      "stalwart_hint": "Lisab parooli muutmise ja Sieve-filtrite haldamise. Võib ohutult lubada ka teistel serveritel."
+      "stalwart_hint": "Lisab lehe Turvalisus (parool, kaheastmeline autentimine ja rakenduste paroolid) ning kustutatud üksuste taastamise. Võib ohutult lubada ka teistel serveritel."
     },
     "auth": {
       "title": "Autentimine",
@@ -4498,6 +4510,11 @@
       "show_time_in_month_view_desc": "Kuva sündmuste kellaajad kuu kalendrivaates. Väikestel ekraanidel kuvatakse punktide asemel täielikud sündmuste kirjed.",
       "tinted_events": "Heledad sündmuste värvid",
       "tinted_events_desc": "Näita sündmusi kalendri värvi heleda tooniga ja värvilise ribaga alguses, nagu Outlookis ja väljatrükil, mitte täisvärviliste plokkidena.",
+      "month_timed_events": "Kellaajaga sündmused kuuvaates",
+      "month_timed_events_desc": "Kuidas algusajaga sündmused kuuvaates välja näevad. Terve päeva ja mitmepäevased sündmused jäävad ribadeks.",
+      "month_timed_events_bar": "Riba",
+      "month_timed_events_text": "Värviline tekst",
+      "month_timed_events_dot": "Täpp ja tekst",
       "show_week_numbers": "Kuva nädalanumbrid",
       "show_week_numbers_desc": "Kuva nädalanumbrid minikalendris",
       "calendar_free_scroll": "Vaba kerimine",
@@ -5174,7 +5191,6 @@
     "settings_ascending": "Kasvav",
     "settings_descending": "Kahanev",
     "disabled_title": "Administraator on failide funktsiooni välja lülitanud",
-    "disabled_description": "Suurte failide üleslaadimine WebDAV kaudu võib põhjustada Stalwart/RocksDB ebastabiilsust, sealhulgas mälupuudusest tingitud krahhe ja taastamatut kettaruumi kasutust. Kustutatud failid ei pruugi objektihoidlast kohe kaduda. Seda funktsiooni ei soovitata kasutada tootmiskeskkonnas.",
     "migration_title": "Failide uuendamine…",
     "migration_description": "Kaustade ja failide korrastamine õigesse struktuuri. See toimub ainult üks kord.",
     "new": "Uus",
@@ -5396,7 +5412,7 @@
   },
   "pwa_install": {
     "title": "Paigalda {appName}",
-    "description": "Paigalda meie rakendus kiireks ligipääsuks ja võrguühenduseta kasutamiseks.",
+    "description": "Paigalda meie rakendus kiireks ligipääsuks.",
     "not_now": "Mitte praegu",
     "install": "Paigalda",
     "dont_remind": "Ära tuleta enam meelde",

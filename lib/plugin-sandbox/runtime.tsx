@@ -35,7 +35,7 @@ import { isFillableSlot, isInlineSlot, MAX_INLINE_SLOT_WIDTH } from './slot-layo
 import type {
   AppInfoView, AppSettingsView, HostFeaturesView, SettingsSearchResult, CalendarEventInput, CalendarEventView, CalendarView, ComposeInput, DraftInput, EmailForwardInput, EmailForwardResult, EmailReadView,
   EmailSummary, IdentityPatch, IdentityView, MailboxView, NotificationInput, SlotName, TaskInput,
-  TaskView, TemplateInput, TemplateView, VacationInput, VacationView,
+  TaskView, TemplateInput, TemplateView, VacationInput, VacationView, ComposerSnapshot, ComposerAttachmentData,
 } from '../plugin-types';
 import { AddressBook, ContactCard } from '../jmap/types';
 import { EncryptionAtRestConfig, PublicKeyInput } from '@/stores/account-security-store';
@@ -150,13 +150,16 @@ function applySettings(next: Record<string, unknown>): void {
 }
 // What api.host.features says: one object for the iframe's lifetime,
 // updated in place on 'host-change' like the settings.
-const hostFeaturesState: HostFeaturesView = { externalSenderLabel: false, externalRecipientWarning: false };
+// noThirdPartyTraffic starts on, as the host's own mode does until it knows.
+const hostFeaturesState: HostFeaturesView = { externalSenderLabel: false, externalRecipientWarning: false, noThirdPartyTraffic: true };
 const hostFeatureListeners = new Set<(features: HostFeaturesView) => void>();
 
 function applyHostFeatures(next: HostFeaturesView | undefined): void {
   if (!next) return;
   hostFeaturesState.externalSenderLabel = next.externalSenderLabel === true;
   hostFeaturesState.externalRecipientWarning = next.externalRecipientWarning === true;
+  // A host older than 1.20 doesn't send it, and never let such a plugin run in the mode.
+  hostFeaturesState.noThirdPartyTraffic = next.noThirdPartyTraffic === true;
   for (const listener of hostFeatureListeners) {
     try { listener(hostFeaturesState); } catch (err) { console.error('[plugin] host feature listener failed', err); }
   }
@@ -616,6 +619,10 @@ function buildPluginApi(manifest: PluginManifest) {
     // The message being written. `composerId` comes from the composer: the
     // context of a click on a composer action, or a composer slot's props.
     composer: {
+      /** Capture own text and metadata for a conditional edit. Needs compose:read. */
+      getSnapshot: (composerId: string) => callApi('composer.getSnapshot', [composerId]) as Promise<ComposerSnapshot>,
+      /** Read a currently attached file. Needs email:blob-read. */
+      readAttachment: (composerId: string, attachmentId: string) => callApi('composer.readAttachment', [composerId, attachmentId]) as Promise<ComposerAttachmentData>,
       /** The user's own text (no signature, no quote) as { html, text }. Needs compose:read. */
       getBody: (composerId: string) =>
         callApi('composer.getBody', [composerId]) as Promise<{ html: string; text: string }>,
@@ -629,14 +636,18 @@ function buildPluginApi(manifest: PluginManifest) {
        */
       replaceSelection: (composerId: string, content: { text: string } | { html: string }, options?: { below?: boolean }) =>
         callApi('composer.replaceSelection', [composerId, content, options]) as Promise<boolean>,
-      /** Replace the user's own text; the signature and the quote stay. Needs compose:write. */
-      replaceBody: (composerId: string, content: { text: string } | { html: string }) =>
-        callApi('composer.replaceBody', [composerId, content]) as Promise<boolean>,
+      /** Replace own text, optionally only at expectedRevision; signature and quote stay. Needs compose:write. */
+      replaceBody: (composerId: string, content: { text: string } | { html: string }, options?: { expectedRevision: string }) =>
+        callApi('composer.replaceBody', [composerId, content, options]) as Promise<boolean>,
       /** Attach a blob from jmap.uploadBlob. Needs email:blob-write. */
       attach: (composerId: string, file: { blobId: string; name: string; type?: string; size: number }) =>
         callApi('composer.attach', [composerId, file]) as Promise<boolean>,
     },
     toast: {
+      /** Stay visible until dismissed or this frame closes; returns a frame-owned handle. */
+      progress: (m: string) => callApi('toast.progress', [m]) as Promise<string>,
+      /** Dismiss this frame's progress handle, even after the burst limit. */
+      dismiss: (id: string) => callApi('toast.dismiss', [id]) as Promise<void>,
       success: (m: string) => { void callApi('toast.success', [m]); },
       error: (m: string) => { void callApi('toast.error', [m]); },
       info: (m: string) => { void callApi('toast.info', [m]); },
@@ -993,10 +1004,23 @@ function buildPluginApi(manifest: PluginManifest) {
       get: (id: string) => callApi('tasks.get', [id]) as Promise<TaskView | null>,
       /** Resolves to the new task, or null when another plugin stopped it. */
       create: (task: TaskInput) => callApi('tasks.create', [task]) as Promise<TaskView | null>,
-      /** Change the given fields. */
+      /**
+       * Change the given fields. `alerts`, `links` and `relatedTo` merge
+       * by id: an entry given is set, one given null is removed, the rest
+       * stay as they are (each written by its own JMAP patch path); null
+       * for the whole map clears it.
+       */
       update: (id: string, patch: Partial<TaskInput>) => callApi('tasks.update', [id, patch]) as Promise<void>,
       /** Mark a task done or not done. */
       setComplete: (id: string, complete: boolean) => callApi('tasks.setComplete', [id, complete]) as Promise<void>,
+      /**
+       * Dismiss one of a task's alerts at `when` (UTC, `2026-05-01T07:30:00Z`;
+       * now when left out), or undo that with null. Bulwark shows no reminder
+       * for a dismissed alert. Refused while the task uses its calendar's
+       * default alerts (TaskView.useDefaultAlerts).
+       */
+      acknowledgeAlert: (id: string, alertId: string, when?: string | null) =>
+        callApi('tasks.acknowledgeAlert', when === undefined ? [id, alertId] : [id, alertId, when]) as Promise<void>,
       delete: (id: string) => callApi('tasks.delete', [id]) as Promise<void>,
     },
     // Message templates (permissions: templates:read / templates:write).

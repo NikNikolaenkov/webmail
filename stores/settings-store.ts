@@ -15,6 +15,7 @@ import { subscriptionOwnerFor } from '@/lib/calendar-subscription-sync';
 import type { FolderCountMode } from '@/lib/folder-counts';
 import { DEFAULT_FILES_SETTINGS, normalizeFilesSettings, type FilesSettings } from '@/lib/files-settings';
 import { orderForMailbox, sanitizeSortLevels, type MessageListOrderScope, type SortLevel } from '@/lib/message-list-order';
+import { isSearchDefaultScope, type SearchDefaultScope } from '@/lib/search-default-scope';
 import { EMPTY_SIGNATURE_DETAILS, sanitizeSignatureDetails, type SignatureDetails } from '@/lib/org-signature';
 import {
   ACCESSIBILITY_DEFAULTS,
@@ -559,6 +560,7 @@ interface SettingsState extends AccessibilitySettings {
   confirmBulkDelete: boolean; // Ask before moving several selected emails to Trash (permanent deletes always ask)
   returnToListAfterAction: boolean; // After delete / archive / move / spam / mark-unread in an open message, return to the list instead of opening the next message
   clearSearchOnFolderChange: boolean; // Reset the search query + advanced filters when switching folders, instead of re-running the search in the newly selected folder (#553 keeps it applied when this is off)
+  searchDefaultScope: SearchDefaultScope; // Where a new search looks: all folders, or only the open one (#1485)
   showPreview: boolean;
   showVerificationCodes: boolean; // Offer the one-time code of a sign-in mail as a copy chip in the list and the reader
   mailLayout: MailLayout;
@@ -623,6 +625,12 @@ interface SettingsState extends AccessibilitySettings {
   calendarHideNonWorkingDays: boolean;
   /** Weekdays as `Date.getDay` numbers (0 = Sunday). */
   calendarWorkingDays: number[];
+  /** An out-of-office reply with dates puts a busy event in the calendar (lib/vacation-calendar.ts). */
+  vacationBlockCalendar: boolean;
+  /** The times of each account's out-of-office event as Bulwark last wrote them, by account id. */
+  vacationCalendarBlocks: Record<string, { start: string; end: string }>;
+  /** Company calendars (organisation.calendars.feeds) the user hid, by feed id. */
+  hiddenCompanyCalendars: string[];
 
   // Calendar Tasks
   enableCalendarTasks: boolean;
@@ -892,6 +900,7 @@ const DEFAULT_SETTINGS = {
   confirmBulkDelete: true,
   returnToListAfterAction: true,
   clearSearchOnFolderChange: false,
+  searchDefaultScope: 'all' as SearchDefaultScope,
   showPreview: true,
   showVerificationCodes: true,
   mailLayout: 'split' as MailLayout,
@@ -946,6 +955,9 @@ const DEFAULT_SETTINGS = {
   calendarDayEndHour: 20,
   calendarHideNonWorkingDays: false,
   calendarWorkingDays: [1, 2, 3, 4, 5] as number[],
+  vacationBlockCalendar: true,
+  vacationCalendarBlocks: {} as Record<string, { start: string; end: string }>,
+  hiddenCompanyCalendars: [] as string[],
 
   // Calendar Tasks
   enableCalendarTasks: false,
@@ -1124,6 +1136,7 @@ function isAllowedPolicyValue(key: string, value: unknown, restriction?: Setting
   if (key === 'sendDelaySeconds' && ![0, 10, 30, 60].includes(value as number)) return false;
   if (key === 'subAddressDelimiter' && !isValidSubAddressDelimiter(value as string)) return false;
   if (key === 'messageListOrderScope' && value !== 'inbox' && value !== 'all') return false;
+  if (key === 'searchDefaultScope' && !isSearchDefaultScope(value)) return false;
   if (key === 'calendarMonthTimedEvents' && !MONTH_TIMED_EVENT_STYLES.includes(value as MonthTimedEventStyle)) return false;
   if (!isAllowedAccessibilityValue(key, value)) return false;
   if (restriction && typeof restriction === 'object') {
@@ -1322,6 +1335,7 @@ export const useSettingsStore = create<SettingsState>()(
           returnToListAfterAction: state.returnToListAfterAction,
           confirmBulkDelete: state.confirmBulkDelete,
           clearSearchOnFolderChange: state.clearSearchOnFolderChange,
+          searchDefaultScope: state.searchDefaultScope,
           showPreview: state.showPreview,
           showVerificationCodes: state.showVerificationCodes,
           mailLayout: state.mailLayout,
@@ -1386,6 +1400,9 @@ export const useSettingsStore = create<SettingsState>()(
           calendarDayEndHour: state.calendarDayEndHour,
           calendarHideNonWorkingDays: state.calendarHideNonWorkingDays,
           calendarWorkingDays: state.calendarWorkingDays,
+          vacationBlockCalendar: state.vacationBlockCalendar,
+          vacationCalendarBlocks: state.vacationCalendarBlocks,
+          hiddenCompanyCalendars: state.hiddenCompanyCalendars,
           toolbarPosition: state.toolbarPosition,
           hideAccountSwitcher: state.hideAccountSwitcher,
           showRailAccountList: state.showRailAccountList,
@@ -1613,6 +1630,9 @@ export const useSettingsStore = create<SettingsState>()(
                 return;
               }
               if (key === 'messageListOrderScope' && settings[key] !== 'inbox' && settings[key] !== 'all') {
+                return;
+              }
+              if (key === 'searchDefaultScope' && !isSearchDefaultScope(settings[key])) {
                 return;
               }
               if (DEVICE_LOCAL_SETTING_KEYS.has(key)) {
@@ -1973,6 +1993,9 @@ export const useSettingsStore = create<SettingsState>()(
             state.messageListOrder = sanitizeSortLevels(state.messageListOrder);
             if (state.messageListOrderScope !== 'inbox' && state.messageListOrderScope !== 'all') {
               state.messageListOrderScope = 'inbox';
+            }
+            if (!isSearchDefaultScope(state.searchDefaultScope)) {
+              state.searchDefaultScope = 'all';
             }
             applyAccessibility(state);
             applyDensity(state.density, state.interfaceLayout);

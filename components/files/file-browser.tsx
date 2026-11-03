@@ -32,6 +32,8 @@ import { ResizeHandle } from "@/components/layout/resize-handle";
 import { AppMain } from "@/components/layout/app-landmarks";
 import { useIsEmbedded } from "@/hooks/use-is-embedded";
 import { getDroppedFilesAndFolders } from "@/lib/webdav/drop-utils";
+import { useAppSidePanel } from "@/components/plugins/app-side-panel";
+import { MAX_SIDE_PANEL_FILES } from "@/lib/plugin-sandbox/assistant/f.types";
 import { resourceToView, useFileStore, isSharedFilesPage, sharedFilePages, type FileResource } from "@/stores/file-store";
 import { TRASH_LOCATION, TRASH_PATH, isTrashLocation } from "@/lib/files-trash";
 import { PluginActions, usePluginActions } from "@/components/plugins/plugin-actions";
@@ -42,6 +44,7 @@ import type { FileNodeRights } from "@/lib/jmap/types";
 import type { FileResourceView } from "@/lib/plugin-types";
 import { isAppShortcutBlocked, isArrowKeyWidgetTarget } from "@/lib/keyboard";
 import { isSingleKeyShortcutOff } from "@/lib/single-key-shortcuts";
+import { FilesListingSkeleton } from "@/components/boot-skeleton/files-skeleton";
 
 const NO_FORMATS: string[] = [];
 
@@ -437,6 +440,26 @@ export function FileBrowser({
   const singleSelected = selectedList.length === 1 ? selectedList[0] : null;
   // What plugins see of the selection (file-actions, file-preview-section).
   const selectedViews = useMemo(() => selectedList.map((r) => resourceToView(r, currentPath)), [selectedList, currentPath]);
+
+  // The plugin side panel (app-side-panel), with the selected files and the
+  // open folder. It shares its place with the details panel: opening it
+  // folds the details, and while the details are open it steps aside here
+  // only (the other views keep it as the user left it).
+  const sidePanelContext = useMemo(() => ({
+    ...(selectedViews.length > 0 ? { files: selectedViews.slice(0, MAX_SIDE_PANEL_FILES), fileCount: selectedViews.length } : {}),
+    folder: { id: currentParentId ?? null, path: currentPath },
+  }), [selectedViews, currentParentId, currentPath]);
+  const sidePanel = useAppSidePanel({ view: "files", context: sidePanelContext, hidden: showDetails, onOpen: () => toggleDetails(false) });
+  // Both stored open (the details here, the panel in any view): once the
+  // panel shows here the details fold, so the two never sit side by side.
+  const sidePanelDocks = sidePanel.docks;
+  const sidePanelWanted = sidePanel.wantsOpen;
+  const sidePanelSettled = useRef(false);
+  useEffect(() => {
+    if (sidePanelSettled.current || !sidePanelDocks) return;
+    sidePanelSettled.current = true;
+    if (showDetails && sidePanelWanted) toggleDetails(false);
+  }, [sidePanelDocks, sidePanelWanted, showDetails, toggleDetails]);
 
   // ---- Breadcrumbs -----------------------------------------------------------
   const crumbs: Crumb[] = useMemo(() => {
@@ -1079,7 +1102,7 @@ export function FileBrowser({
       );
     }
     // Until the first listing is in, an empty list means "not loaded yet".
-    if ((isLoading || !hasListed) && resources.length === 0) return <ListSkeleton />;
+    if ((isLoading || !hasListed) && resources.length === 0) return <FilesListingSkeleton view={viewMode} />;
     if (showEmpty && searchQuery) return <NoSearchResults query={searchQuery} onClear={() => setSearchQuery("")} />;
     if (showEmpty && inTrash) {
       return <EmptyState icon={Trash2} title={t("trash_empty_title")} description={t("trash_empty_hint")} />;
@@ -1282,6 +1305,7 @@ export function FileBrowser({
           toolsHidden={accountPickerMode}
           selection={selectionActions}
           emptyTrash={inTrash && onEmptyTrash ? { onEmpty: onEmptyTrash, disabled: trashCount === 0 } : undefined}
+          panelToggle={sidePanel.toggle}
         />
 
         {error && (
@@ -1295,7 +1319,7 @@ export function FileBrowser({
           </div>
         )}
 
-        <div className="relative flex flex-1 min-h-0">
+        <div ref={sidePanel.rowRef} className="relative flex flex-1 min-h-0">
           <div
             ref={scrollAreaRef}
             className="relative flex-1 min-w-0 overflow-y-auto"
@@ -1356,6 +1380,7 @@ export function FileBrowser({
             </Button>
           )}
 
+          {sidePanel.panel}
         </div>
       </AppMain>
 
@@ -1519,21 +1544,6 @@ function SharedWithMe({ folders, pages, onOpen, iconOptions }: {
         ))}
       </div>
     </section>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="px-4" aria-hidden>
-      <div className="h-9 border-b border-border" />
-      {Array.from({ length: 7 }, (_, i) => (
-        <div key={i} className="h-10 flex items-center gap-3 border-b border-border/60">
-          <div className="w-4 h-4 rounded bg-muted animate-pulse" />
-          <div className="w-5 h-5 rounded bg-muted animate-pulse" />
-          <div className="h-3.5 rounded bg-muted animate-pulse" style={{ width: `${30 + ((i * 37) % 35)}%` }} />
-        </div>
-      ))}
-    </div>
   );
 }
 

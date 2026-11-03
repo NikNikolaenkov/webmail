@@ -15,6 +15,8 @@ import { useReadAloud } from "@/hooks/use-read-aloud";
 import { ReadAloudBar } from "./read-aloud-bar";
 import { ReaderAttachments, type AttachmentDragProps } from "./reader-attachments";
 import { ReaderViewDialog } from "./reader-view-dialog";
+import { MessagePrint, type MessagePrintFields } from "./message-print";
+import { usePrintListener, usePrinting } from "@/components/print/print-root";
 import { ReadingMask } from "./reading-mask";
 import { collectReferencedCids, isEmbeddedInBody, isReportPart, normalizeCid, rewriteCidReferences } from "@/lib/attachment-visibility";
 import { getAttachmentDisplayName } from "@/lib/attachment-name";
@@ -40,6 +42,7 @@ import { useBottomControls } from "@/hooks/use-bottom-controls";
 import { useComposingSurface } from "@/hooks/use-composing-surface";
 import { ReaderSelectionMenu, useReaderSelectionMenu, watchBodySelection, watchElementSelection } from "./reader-selection-menu";
 import { onPanelRequest } from "@/lib/plugin-sandbox/panel-requests";
+import { PluginPanelToggle, panelLabelOf, panelShortcutOf } from "@/components/plugins/app-side-panel";
 import type { ComposerMetadata } from "@/lib/plugin-sandbox/composer-registry";
 import { QuickReplyPluginActions } from "./quick-reply-plugin-actions";
 import { quickReplyEnvelope } from "@/lib/outgoing/quick-reply-envelope";
@@ -98,7 +101,6 @@ import {
   MapPin,
   StickyNote,
   PanelRightClose,
-  PanelRightOpen,
   Send,
   FolderInput,
   Sun,
@@ -117,6 +119,7 @@ import {
   Pencil,
   Paperclip,
 } from "@/components/icons";
+import { MailMessageSkeleton, MailMessageToolbarSkeleton } from "@/components/boot-skeleton/mail-skeleton";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import type { Attachment as PostalMimeAttachment } from 'postal-mime';
@@ -135,6 +138,8 @@ import { useIsPaneScoped } from "@/hooks/use-pane-context";
 import { useAuthStore } from "@/stores/auth-store";
 import { useAccountStore } from "@/stores/account-store";
 import { useEmailStore, resolveEmailBlobContext, emailWriteSource, type EmailBlobContext } from "@/stores/email-store";
+import { useListSelection } from "@/lib/plugin-sandbox/assistant/b.list-selection";
+import { readability } from "@/lib/plugin-sandbox/assistant/b.projection";
 import { useThemeStore } from "@/stores/theme-store";
 import { EmailIdentityBadge } from "./email-identity-badge";
 import { ExternalSenderChip } from "./external-sender-chip";
@@ -287,6 +292,8 @@ interface EmailViewerProps {
   mailboxes?: Mailbox[];
   selectedMailbox?: string;
   className?: string;
+  /** The side panel hears of the messages ticked in the main list (false: a Pro tab, whose message isn't from that list). */
+  withListSelection?: boolean;
 }
 
 // Helper function to format recipients with contextual display
@@ -363,6 +370,12 @@ function getAttachmentContentBytes(attachment: {
   }
 
   return null;
+}
+
+/** Whether the element takes up room on screen (not in a hidden tab or a display: none pane). */
+function isShownOnScreen(el: HTMLElement): boolean {
+  if (typeof el.checkVisibility === 'function') return el.checkVisibility();
+  return el.getClientRects().length > 0;
 }
 
 /**
@@ -1312,6 +1325,7 @@ export function EmailViewer({
   mailboxes = [],
   selectedMailbox = "",
   className,
+  withListSelection = true,
 }: EmailViewerProps) {
   const t = useTranslations('email_viewer');
   const archiveActionEnabled = useArchiveActionEnabled();
@@ -1800,9 +1814,11 @@ export function EmailViewer({
   // each slot post its props to the plugin again and re-run shouldShow.
   const wantsPluginEmailView = hasDetailSidebar || hasDetailsSlotOffers || hasBannerOffers
     || hasHeaderOffers || hasBelowSubjectOffers || hasAboveQuoteOffers;
+  // A message of another connected login (unified view, Pro tab): the host
+  // reads parts only through the signed-in login, so plugins hear they can't.
   const pluginEmailView = useMemo(
-    () => (email && wantsPluginEmailView ? emailToReadView(email) : null),
-    [email, wantsPluginEmailView],
+    () => (email && wantsPluginEmailView ? { ...emailToReadView(email), ...readability(blobClient === client) } : null),
+    [email, wantsPluginEmailView, blobClient, client],
   );
   // Reader frames learn the layout: the bar a plugin shows on phones has no
   // place next to a side panel on a desktop.
@@ -1817,9 +1833,11 @@ export function EmailViewer({
     setBodySelection((prev) => (prev.text === text ? prev : (text ? { text } : NO_BODY_SELECTION)));
   }, []);
   const [detailFocusRequest, setDetailFocusRequest] = useState(0);
+  // The messages ticked in the list, for the AI assistant (lib/plugin-sandbox/assistant).
+  const listSelection = useListSelection(withListSelection);
   const pluginDetailProps = useMemo(
-    () => ({ email: pluginEmailView, selection: bodySelection, focusRequest: detailFocusRequest }),
-    [pluginEmailView, bodySelection, detailFocusRequest],
+    () => ({ email: pluginEmailView, selection: bodySelection, listSelection, focusRequest: detailFocusRequest }),
+    [pluginEmailView, bodySelection, listSelection, detailFocusRequest],
   );
   const selectionMenu = useReaderSelectionMenu();
   const emailIdRef = useRef(email?.id);
@@ -1883,6 +1901,12 @@ export function EmailViewer({
       setDetailSidebarForcedOpen(false);
     }
   };
+  // The one button that shows and hides the plugin side panel, at the end of
+  // the toolbar row in every state of the reader (message, loading, none, scheduled).
+  // The same button as in the other views' side panels (app-side-panel.tsx).
+  const panelToggle = hasDetailSidebar && !isMobile ? (
+    <PluginPanelToggle open={!sidebarCollapsed} onClick={toggleDetailSidebar} className={cn(mvViewer && "order-10")} shortcut={panelShortcutOf(detailSlots.map((o) => o.pluginId))} />
+  ) : null;
   useEffect(() => onPanelRequest((request) => {
     if (request.slot !== 'email-detail-sidebar') return null;
     const state = detailPanelRef.current;
@@ -3628,6 +3652,34 @@ export function EmailViewer({
     openMailImport({ mailboxId: useEmailStore.getState().selectedMailbox || undefined });
   };
 
+  // What a printout of the message shows, for the Print action's window and
+  // for the page's print copy (Ctrl+P). Text fields are unescaped.
+  const messagePrintFields = (): MessagePrintFields | null => {
+    if (!email) return null;
+    const printSender = email.from?.[0];
+    const formatRecipient = (r: { name?: string | null; email: string }) =>
+      r.name ? `${r.name} <${r.email}>` : r.email;
+    // The body was sanitized with EMAIL_IFRAME_SANITIZE_CONFIG which permits
+    // <style>. A printout has no iframe isolation, so re-sanitize with the
+    // stricter config that forbids <style> before injecting into the DOM.
+    // A plain-text body is escaped text with its own newlines: it prints its
+    // trailing quote opened instead of behind the collapsed toggle.
+    const plain = !effectiveEmailContent.isHtml;
+    return {
+      subject: email.subject || t('no_subject'),
+      sender: printSender?.name
+        ? `${printSender.name} <${printSender.email}>`
+        : printSender?.email || t('unknown_sender'),
+      to: email.to?.map(formatRecipient).join(', ') || '',
+      cc: email.cc?.map(formatRecipient).join(', ') || '',
+      date: formatDateTime(emailDisplayDate(email), timeFormat, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }),
+      bodyHtml: plain
+        ? effectiveEmailContent.html.replace(/<details>/g, '<details open>')
+        : sanitizeEmailHtml(effectiveEmailContent.html),
+      plain,
+    };
+  };
+
   // Print only the email content in a new window. A print asked for from
   // the list's row menu brings its own window, opened in that click.
   const handlePrint = (openedWindow?: Window) => {
@@ -3636,23 +3688,16 @@ export function EmailViewer({
       openedWindow?.close();
       return;
     }
+    const fields = messagePrintFields();
+    if (!fields) return;
     const printWatermark = watermark ? watermarkForPrint(watermark) : null;
-    const printSender = email.from?.[0];
-    const date = formatDateTime(emailDisplayDate(email), timeFormat, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-    const formatRecipient = (r: { name?: string | null; email: string }) =>
-      r.name ? `${escapeHtml(r.name)} &lt;${escapeHtml(r.email)}&gt;` : escapeHtml(r.email);
-    const toList = email.to?.map(formatRecipient).join(', ') || '';
-    const ccList = email.cc?.map(formatRecipient).join(', ') || '';
-    const subjectText = email.subject || t('no_subject');
-    const senderText = printSender?.name
-      ? `${printSender.name} <${printSender.email}>`
-      : printSender?.email || t('unknown_sender');
-    // The body was sanitized with EMAIL_IFRAME_SANITIZE_CONFIG which permits
-    // <style>. The print window has no iframe isolation, so re-sanitize with
-    // the stricter config that forbids <style> before injecting into the DOM.
-    const printableBody = effectiveEmailContent.isHtml
-      ? sanitizeEmailHtml(effectiveEmailContent.html)
-      : effectiveEmailContent.html;
+    const date = fields.date;
+    const toList = escapeHtml(fields.to);
+    const ccList = escapeHtml(fields.cc);
+    const subjectText = fields.subject;
+    const senderText = fields.sender;
+    const plainBody = fields.plain;
+    const printableBody = fields.bodyHtml;
 
     const printWindow = openedWindow ?? window.open('', '_blank');
     if (!printWindow) return;
@@ -3677,6 +3722,9 @@ export function EmailViewer({
   .meta { font-size: 13px; color: #555; line-height: 1.6; }
   .meta strong { color: #000; }
   .body { font-size: 14px; line-height: 1.6; }
+  /* Plain text keeps its line breaks, as in the reader. */
+  .body.plain { white-space: pre-wrap; word-break: break-word; }
+  .body.plain summary { display: none !important; }
   /* Only force the cap on images that set no width of their own: an
      !important 100% also overrides a sender's inline max-width, and an
      image sized by max-width + max-height + width:100% then grows to
@@ -3698,7 +3746,7 @@ ${printWatermark ? printWatermark.html : ''}
     ${date ? `<div><strong>${escapeHtml(t('date'))}:</strong> ${escapeHtml(date)}</div>` : ''}
   </div>
 </div>
-<div class="body">${printableBody}</div>
+<div class="body${plainBody ? ' plain' : ''}">${printableBody}</div>
 </body></html>`);
     printWindow.document.close();
     printWindow.focus();
@@ -3715,6 +3763,20 @@ ${printWatermark ? printWatermark.html : ''}
     usePrintRequestStore.getState().setRequest(null);
     if (!printRequest.win.closed) handlePrintRef.current(printRequest.win);
   }, [printReady, printRequest]);
+
+  // Ctrl+P and the browser's Print menu print the message alone (app/print.css),
+  // not the app around it with its plugin panels and fixed heights. Only a
+  // reader on screen when printing starts: a Pro tab in the background keeps
+  // its message off the paper. Checked once, as the app is hidden while printing.
+  usePrintListener();
+  const printing = usePrinting();
+  const printShown = useMemo(
+    () => printing && !!viewerRootEl && isShownOnScreen(viewerRootEl),
+    [printing, viewerRootEl],
+  );
+  const printCopyFields = printShown && !devices.noPrint && !isLoading && !!email?.bodyValues
+    ? messagePrintFields()
+    : null;
 
   // Detect List-Unsubscribe header for newsletter banners
   const listHeaders = useMemo(() => {
@@ -3851,31 +3913,29 @@ ${printWatermark ? printWatermark.html : ''}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readReceiptResponse, shouldOfferReadReceipt, email?.id, sendReadReceiptNow]);
 
+  // The toolbar row with only the panel button: over the empty or loading
+  // reader, and on top when the user put the toolbar below the subject. Same
+  // height and place as the full toolbar, so the button never moves.
+  const toggleOnlyToolbar = panelToggle && liftToolbar ? (
+    <div
+      data-viewer-top-toolbar="full-width"
+      data-toolbar-toggle-only=""
+      className={cn("bg-background flex-shrink-0", !mvViewer && "border-b border-border")}
+    >
+      <div className={cn("px-2 sm:px-4 lg:px-6 flex items-center justify-end", mvViewer ? "h-12 lg:ps-4" : "h-14")}>
+        {panelToggle}
+      </div>
+    </div>
+  ) : null;
+
   // The plugin side panel. One element in the same place whatever the viewer
   // shows (a message, the next one loading, none), so its frame lives on while
-  // the user reads on instead of starting over with every message.
-  const panelToggleInToolbar = !!email;
+  // the user reads on instead of starting over with every message. Its button
+  // is always at the end of the toolbar row above it.
   const sidePanel = (
   <>
     {hasDetailSidebar && !isMobile && (
       <div className="contents" data-reader-side-panel="">
-        {/* With a message open the toggle sits in its toolbar; without one, here. */}
-        {sidebarCollapsed && !panelToggleInToolbar && (
-          <div className="flex flex-col items-center border-s border-border bg-background">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                setDetailSidebarCollapsed(false);
-                if (readerTooNarrow) setDetailSidebarForcedOpen(true);
-              }}
-              className="h-8 w-8 m-1"
-              aria-label={t('plugin_panel_show')}
-            >
-              <PanelRightOpen className="w-4 h-4" />
-            </Button>
-          </div>
-        )}
         {!sidebarCollapsed && (
           <>
             {!sidebarOverlay && (
@@ -3894,6 +3954,8 @@ ${printWatermark ? printWatermark.html : ''}
               />
             )}
             <div
+              role="complementary"
+              aria-label={panelLabelOf(detailSlots.map((o) => o.pluginId), t('plugin_panel'))}
               data-plugin-detail-panel={sidebarOverlay ? 'overlay' : 'docked'}
               className={cn(
                 "flex flex-col h-full border-s border-border bg-background overflow-hidden",
@@ -3903,22 +3965,6 @@ ${printWatermark ? printWatermark.html : ''}
                 ? { width: Math.min(detailSidebarWidth, Math.max(200, viewerWidth - 48)) }
                 : { width: detailSidebarWidth, minWidth: detailSidebarWidth }}
             >
-              {!panelToggleInToolbar && (
-                <div className="flex items-center justify-end px-1 py-1 border-b border-border shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setDetailSidebarCollapsed(true);
-                      setDetailSidebarForcedOpen(false);
-                    }}
-                    className="h-7 w-7"
-                    aria-label={t('plugin_panel_hide')}
-                  >
-                    <PanelRightClose className="w-4 h-4" />
-                  </Button>
-                </div>
-              )}
               <div className="flex-1 min-h-0 overflow-y-auto">
                 <PluginSlot name="email-detail-sidebar" extraProps={pluginDetailProps} />
               </div>
@@ -3929,12 +3975,14 @@ ${printWatermark ? printWatermark.html : ''}
     )}
   </>
   );
-  const shell = (content: React.ReactNode) => (
+  // `top` is the row above the message row; by default the one holding only
+  // the panel button (none without a panel or on a phone).
+  const shell = (content: React.ReactNode, top: React.ReactNode = toggleOnlyToolbar) => (
     <div
       ref={setViewerRootEl}
       className={cn("flex-1 flex flex-col h-full bg-background overflow-hidden relative", className)}
     >
-      {null}
+      {top}
       <div className="flex-1 min-h-0 flex flex-row overflow-hidden relative">
         {content}
         {sidePanel}
@@ -3943,53 +3991,21 @@ ${printWatermark ? printWatermark.html : ''}
     </div>
   );
 
-  // Show loading skeleton while email is being fetched
+  // Show loading skeleton while email is being fetched: the page skeleton's
+  // message pane, so a linked message keeps the shape it had before the app
+  // started.
+  // Its toolbar sits where the loaded reader puts its own: above the message
+  // row when lifted, so the row doesn't move when the message arrives. The
+  // panel button is real in it, at the end of the row as in the loaded one.
   if (isLoading && !email) {
+    const lifted = toolbarPosition === 'top' && liftToolbar;
     return shell(
-      <div className="flex-1 min-w-0 flex flex-col h-full bg-background overflow-hidden animate-in fade-in duration-200">
-        {/* Loading Header Skeleton - gentler animation */}
-        <div className="bg-background border-b border-border">
-          <div className="px-4 lg:px-6 py-3 lg:py-4">
-            <div className="flex items-start justify-between gap-2 lg:gap-4">
-              <div className="flex-1 min-w-0 space-y-2 lg:space-y-3">
-                <div className="h-6 lg:h-8 bg-muted/60 rounded-md w-3/4"></div>
-                <div className="flex items-center gap-2 lg:gap-3">
-                  <div className="h-3 lg:h-4 bg-muted/60 rounded w-24 lg:w-32"></div>
-                  <div className="h-3 lg:h-4 bg-muted/60 rounded w-16 lg:w-24"></div>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 lg:gap-2">
-                <div className="h-8 w-8 lg:w-20 bg-muted/60 rounded"></div>
-                <div className="h-8 w-8 bg-muted/60 rounded hidden lg:block"></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Loading Sender Info Skeleton */}
-          <div className="px-4 lg:px-6 pb-3 lg:pb-4">
-            <div className="flex items-start gap-3 lg:gap-4">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-muted/60 rounded-full"></div>
-              <div className="flex-1 space-y-2">
-                <div className="h-4 bg-muted/60 rounded w-48"></div>
-                <div className="h-3 bg-muted/60 rounded w-64"></div>
-              </div>
-            </div>
-          </div>
+      <MailMessageSkeleton toolbar={!lifted} />,
+      lifted ? (
+        <div data-viewer-top-toolbar="full-width" className="flex-shrink-0">
+          <MailMessageToolbarSkeleton end={panelToggle} />
         </div>
-
-        {/* Loading Content Skeleton */}
-        <div className="flex-1 overflow-auto bg-muted/20">
-          <div className="px-6 pt-4 pb-6">
-            <div className="space-y-3">
-              <div className="h-4 bg-muted/60 rounded w-full"></div>
-              <div className="h-4 bg-muted/60 rounded w-5/6"></div>
-              <div className="h-4 bg-muted/60 rounded w-4/6"></div>
-              <div className="h-4 bg-muted/60 rounded w-full"></div>
-              <div className="h-4 bg-muted/60 rounded w-3/4"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+      ) : toggleOnlyToolbar,
     );
   }
 
@@ -4527,22 +4543,11 @@ ${printWatermark ? printWatermark.html : ''}
           )}
         </div>
         {/* The plugin side panel: shown or hidden for every message alike. */}
-        {hasDetailSidebar && !isMobile && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleDetailSidebar}
-            className={cn("h-8 w-8", mvViewer && "order-10")}
-            title={t(sidebarCollapsed ? 'plugin_panel_show' : 'plugin_panel_hide')}
-            aria-label={t(sidebarCollapsed ? 'plugin_panel_show' : 'plugin_panel_hide')}
-            aria-pressed={!sidebarCollapsed}
-            data-plugin-panel-toggle=""
-          >
-            {sidebarCollapsed ? <PanelRightOpen className="w-4 h-4 text-muted-foreground" /> : <PanelRightClose className="w-4 h-4 text-muted-foreground" />}
-          </Button>
-        )}
+        {toolbarPosition === 'top' && panelToggle}
       </div>
       )}
+      {/* A scheduled message has no organize actions; the panel button still ends the row. */}
+      {isScheduled && toolbarPosition === 'top' && panelToggle}
     </>
   );
 
@@ -4579,7 +4584,8 @@ ${printWatermark ? printWatermark.html : ''}
       data-tour="email-viewer"
       className={cn("flex-1 flex flex-col h-full bg-background overflow-hidden relative", className)}
     >
-    {toolbarPosition === 'top' && liftToolbar && topToolbar}
+    {printCopyFields && <MessagePrint fields={printCopyFields} />}
+    {toolbarPosition === 'top' && liftToolbar ? topToolbar : toggleOnlyToolbar}
     {/* The message and the side panels, below the toolbar. Overlays anchor here. */}
     <div className="flex-1 min-h-0 flex flex-row overflow-hidden relative">
     <>

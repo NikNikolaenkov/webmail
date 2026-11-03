@@ -843,6 +843,7 @@
     "mv_position": "{index} / {total}",
     "plugin_panel_show": "Näita pistikprogrammi paneeli",
     "plugin_panel_hide": "Peida pistikprogrammi paneel",
+    "plugin_panel": "Pistikprogrammi paneel",
     "copy": "Kopeeri",
     "contact_added": "Kontakt lisatud",
     "save_to_files": {
@@ -1951,6 +1952,14 @@
         "description": "Kuhu lisada allkiri vastustes ja edastustes. Tsiteeritud teksti kohal mõjub loomuliku vastuse lõpetusena; all hoiab algse kirja katkematuna.",
         "above_quote": "Enne tsiteeritud teksti",
         "below_quote": "Pärast tsiteeritud teksti"
+      },
+      "signature_new_mail": {
+        "label": "Allkirja uutes kirjades",
+        "description": "Sisestab allkirja automaatselt uue kirja koostamisel. Lülita välja, et iga uus kiri algaks ilma allkirjata."
+      },
+      "signature_reply_forward": {
+        "label": "Allkirja vastamisel ja edastamisel",
+        "description": "Lisab allkirja automaatselt vastamisel või kirja edastamisel. Lülita välja, et saata need ilma allkirjata."
       },
       "signature_separator": {
         "label": "Allkirja eraldaja",
@@ -5830,8 +5839,8 @@
         "body": "Saata sinu kontolt täielikke kirju, näiteks allkirjastatud või krüpteeritud."
       },
       "email_blob_read": {
-        "title": "Loe kirjade toorsisu",
-        "body": "Lugeda manuseid ja kirjade täielikku lähteteksti, millega tegutsed, ning iga faili, mille lisad, enne selle saatmist."
+        "title": "Lugeda manuseid ja kirjade lähteteksti",
+        "body": "Lugeda manuseid (ka nende teksti ja pilte) ja kirjade täielikku lähteteksti, millega tegutsed, ning iga faili, mille lisad, enne selle saatmist."
       },
       "email_blob_write": {
         "title": "Asenda manuseid enne saatmist",
@@ -5849,6 +5858,10 @@
         "title": "Muuda sinu kalendrit",
         "body": "Luua, muuta ja kustutada sündmusi."
       },
+      "calendar_respond": {
+        "title": "Vasta kutsetele",
+        "body": "Nõustuda kalendrikutsetega või neist keelduda. Sinu vastus saadetakse korraldajale e-postiga."
+      },
       "contacts_read": {
         "title": "Loe sinu kontakte",
         "body": "Otsida ja lugeda sinu aadressiraamatuid."
@@ -5859,11 +5872,11 @@
       },
       "files_read": {
         "title": "Loe sinu faile",
-        "body": "Sirvida ja avada sinu kontol hoitavaid faile."
+        "body": "Leida, avada ja lugeda sinu konto faile."
       },
       "files_write": {
         "title": "Muuda sinu faile",
-        "body": "Laadida üles, ümber nimetada, liigutada ja kustutada faile sinu kontol."
+        "body": "Salvestada, luua, ümber nimetada ja liigutada faile sinu kontol ning takistada faili kustutamist."
       },
       "identity_read": {
         "title": "Vaata sinu saatjaaadresse",
@@ -5914,8 +5927,12 @@
         "body": "Näha sinu eelistusi ja siltide definitsioone."
       },
       "settings_write": {
+        "title": "Muuda sinu silte",
+        "body": "Lisada, ümber nimetada ja ümber järjestada sinu silte ning takistada sinu seadete muutmist."
+      },
+      "settings_change": {
         "title": "Muuda sinu seadeid",
-        "body": "Lisada ja ümber järjestada silte ning muuta sinu eelistusi."
+        "body": "Muuta rakenduse välimust ja toimimist, näiteks teemat, kellaajavormingut või lugemispaani. Sinu organisatsiooni määratud seaded jäävad samaks."
       },
       "security_read": {
         "title": "Vaata sinu konto turvalisust",
@@ -5977,6 +5994,10 @@
         "title": "Lisa kirja üksikasjadele paneele",
         "body": "Näidata oma paneeli avatud kirja kõrval või all."
       },
+      "ui_side_panel": {
+        "title": "Lisa paneel teistesse vaadetesse",
+        "body": "Näita oma paneeli kalendri, kontaktide, failide ja seadete kõrval."
+      },
       "ui_download_file": {
         "title": "Salvesta faile sinu seadmesse",
         "body": "Pakkuda allalaadimiseks enda loodud faile."
@@ -6035,7 +6056,7 @@
       },
       "ui_tasks": {
         "title": "Lisa ülesannetesse",
-        "body": "Näidata oma jaotisi ülesande üksikasjades ja nuppe ülesannete nimekirjas."
+        "body": "Näidata oma jaotisi ülesande üksikasjades, nuppe ülesannete nimekirjas ja oma ülesannete nimekirja Bulwarki oma asemel."
       },
       "ui_files": {
         "title": "Lisa failidesse",
@@ -6064,6 +6085,10 @@
       "compose_write": {
         "title": "Muuda kirja, mida kirjutad",
         "body": "Asendada või lisada teksti kirjas selle kirjutamise ajal, kui kasutad pistikprogrammi kirjakoostajas. Iga muudatuse saad tagasi võtta ja sina otsustad ikka, kas saata."
+      },
+      "compose_check": {
+        "title": "Kontrollida, mida kirjutate",
+        "body": "Loeb kirjutamise ajal, mida koostajas kirjutate, ja võib selle saata teenusele, mida kasutab. Ainult siis, kui õigekirja kontroll on sees, ja mitte midagi, kuni sõnum on määratud allkirjastamiseks või krüpteerimiseks. Tekst, mille kirjutasite enne selle sisselülitamist, võib olla juba kontrollitud."
       },
       "email_forward": {
         "title": "Sinu kirjade edasisaatmine",
@@ -6354,6 +6379,77 @@
       "party_size": "Inimesi: {count}",
       "added_from": "Lisatud kirjast, mille saatis {domain}",
       "added_from_subject": "Lisatud kirjast „{subject}“, mille saatis {domain}"
+    }
+  },
+  "proofreading": {
+    "kind": {
+      "spelling": "Õigekiri",
+      "grammar": "Grammatika",
+      "style": "Stiil",
+      "other": "Soovitus"
+    },
+    "popup": {
+      "label": "{kind}: {word}",
+      "no_suggestions": "Soovitusi pole",
+      "suggestions": "Soovitused",
+      "replace_with": "Asenda: {text}",
+      "also": "Ka {checker} leidis",
+      "ignore": "Eira",
+      "add_to_dictionary": "Lisa sõnastikku",
+      "disable_rule": "Lülita see reegel välja",
+      "changed": "Tekst muutus. Oota järgmist kontrolli."
+    },
+    "list_item": "{word}: {message} Soovitus: {suggestion}",
+    "list_item_no_suggestion": "{word}: {message}",
+    "announce_count": "{count, plural, =0 {Õigekirja- ega grammatikavigu pole} one {# õigekirja- või grammatikaviga} other {# õigekirja- või grammatikaviga}}",
+    "status": {
+      "title": "Õigekirja kontroll",
+      "off": "Õigekirja kontroll väljas",
+      "paused": "Õigekirja kontroll peatatud",
+      "rate_limited": "Kontroll peatatud",
+      "unavailable": "Kontroll pole saadaval",
+      "checking": "Kontrollin…",
+      "issues": "{count, plural, =0 {Probleeme pole} one {# probleem} other {# probleemi}}"
+    },
+    "panel": {
+      "title": "Õigekirja kontroll",
+      "required": "Sinu organisatsiooni nõue",
+      "check_message": "Kontrolli seda sõnumit",
+      "notice": "Kirjutamise ajal läheb sinu tekst kontrollimiseks teenusele {checkers}. Sinu allkiri ja tsiteeritud sõnum jäetakse välja. Midagi ei saadeta, kuni sõnum on määratud allkirjastamiseks või krüpteerimiseks; see, mille kirjutasid enne selle sisselülitamist, võib olla juba kontrollitud.",
+      "turn_on": "Lülita õigekirja kontroll sisse",
+      "paused_protected": "Midagi ei kontrollita, kuni see sõnum on määratud allkirjastamiseks või krüpteerimiseks.",
+      "paused_unknown": "{plugin} võib sõnumeid allkirjastada või krüpteerida ilma seda siin näitamata, seega ei kontrollita midagi, kuni see on sees.",
+      "rate_limited": "{checker} palus oodata. Kontroll jätkub minuti pärast.",
+      "unavailable": "{checker} ei saa praegu kontrollida. See proovib uuesti, kui jätkad kirjutamist.",
+      "no_issues": "Probleeme ei leitud.",
+      "list_label": "Probleemid selles sõnumis",
+      "shortcuts": "Järgmine probleem: {next}. Eelmine: {previous}."
+    },
+    "notice": {
+      "on": "Õigekirja kontroll on sees. Kirjutamise ajal läheb sinu tekst kontrollimiseks teenusele {checkers}, ilma sinu allkirja ja tsiteeritud sõnumita. Midagi ei saadeta, kuni sõnum on määratud allkirjastamiseks või krüpteerimiseks; see, mille kirjutasid enne seda, võib olla juba kontrollitud.",
+      "forced": "Sinu organisatsioon lülitas õigekirja kontrolli sisse. Kirjutamise ajal läheb sinu tekst kontrollimiseks teenusele {checkers}, ilma sinu allkirja ja tsiteeritud sõnumita. Midagi ei saadeta, kuni sõnum on määratud allkirjastamiseks või krüpteerimiseks; see, mille kirjutasid enne seda, võib olla juba kontrollitud.",
+      "ok": "OK"
+    },
+    "send_warning": {
+      "title": "Kas saata lahendamata probleemidega?",
+      "body": "{count, plural, one {# õigekirja- või grammatikaviga on} other {# õigekirja- või grammatikaviga on}} selles sõnumis veel lahendamata.",
+      "review": "Vaata üle",
+      "send": "Saada ikkagi"
+    },
+    "settings": {
+      "title": "Õigekirja kontroll",
+      "description": "Joonib kirjutamise ajal alla õigekirja- ja grammatikavead ning pakub parandusi.",
+      "enable": "Kontrolli õigekirja ja grammatikat kirjutamise ajal",
+      "enable_description": "Sinu kirjutatud tekst läheb õigekirja kontrolli lisale ja teenusele, mida see kasutab, ilma sinu allkirja ja tsiteeritud sõnumiteta. Midagi ei saadeta, kuni sõnum on määratud allkirjastamiseks või krüpteerimiseks.",
+      "no_checker": "Õigekirja kontrolli lisa pole paigaldatud. Palu administraatoril see lisada.",
+      "plugin_description": "Saadab sinu kirjutatu teenusele {plugin}.",
+      "writing_language": "Kirjutamise keel",
+      "writing_language_description": "Keel, milles tavaliselt kirjutad. Seda kasutavad õigekirja kontroll ja sinu brauseri õigekirjakontroll.",
+      "auto": "Tuvasta automaatselt"
+    },
+    "shortcuts": {
+      "next_issue": "Järgmine õigekirja- või grammatikaviga",
+      "previous_issue": "Eelmine õigekirja- või grammatikaviga"
     }
   }
 }

@@ -843,6 +843,7 @@
     "mv_position": "{index} de {total}",
     "plugin_panel_show": "Mostrar el panel del complemento",
     "plugin_panel_hide": "Ocultar el panel del complemento",
+    "plugin_panel": "Panel del complemento",
     "copy": "Copiar",
     "contact_added": "Contacto añadido",
     "save_to_files": {
@@ -1939,6 +1940,14 @@
         "description": "Dónde insertar tu firma en respuestas y reenvíos. Encima del texto citado se lee de forma natural como cierre de la respuesta; debajo mantiene el mensaje original contiguo.",
         "above_quote": "Antes del texto citado",
         "below_quote": "Después del texto citado"
+      },
+      "signature_new_mail": {
+        "label": "Firma en correos nuevos",
+        "description": "Inserta automáticamente tu firma al redactar un mensaje nuevo. Desactívalo para empezar cada mensaje nuevo sin ella."
+      },
+      "signature_reply_forward": {
+        "label": "Firma en respuestas y reenvíos",
+        "description": "Añade automáticamente tu firma al responder o reenviar un mensaje. Desactívalo para enviarlos sin ella."
       },
       "signature_separator": {
         "label": "Delimitador de firma",
@@ -5830,8 +5839,8 @@
         "body": "Enviar mensajes completos, por ejemplo firmados o cifrados, desde tu cuenta."
       },
       "email_blob_read": {
-        "title": "Leer el contenido sin procesar de los mensajes",
-        "body": "Leer los datos originales de tus mensajes y adjuntos, y de cada archivo que adjuntas antes de enviarlo."
+        "title": "Leer los adjuntos y el código fuente de los mensajes",
+        "body": "Leer los adjuntos (también su texto y sus imágenes) y el código fuente completo de los mensajes con los que trabajas, y cada archivo que adjuntas antes de enviarlo."
       },
       "email_blob_write": {
         "title": "Reemplazar adjuntos antes de enviar",
@@ -5849,6 +5858,10 @@
         "title": "Cambiar tu calendario",
         "body": "Crear, cambiar y eliminar eventos."
       },
+      "calendar_respond": {
+        "title": "Responder a invitaciones",
+        "body": "Aceptar o rechazar invitaciones de calendario. Tu respuesta se envía al organizador por correo electrónico."
+      },
       "contacts_read": {
         "title": "Leer tus contactos",
         "body": "Buscar y leer en tus libretas de direcciones."
@@ -5859,11 +5872,11 @@
       },
       "files_read": {
         "title": "Leer tus archivos",
-        "body": "Explorar y abrir los archivos guardados en tu cuenta."
+        "body": "Buscar, abrir y leer los archivos de tu cuenta."
       },
       "files_write": {
         "title": "Cambiar tus archivos",
-        "body": "Subir, renombrar, mover y eliminar archivos de tu cuenta."
+        "body": "Guardar, crear, renombrar y mover archivos de tu cuenta, e impedir que se elimine un archivo."
       },
       "identity_read": {
         "title": "Ver tus direcciones de remitente",
@@ -5914,8 +5927,12 @@
         "body": "Ver tus preferencias y las definiciones de tus etiquetas."
       },
       "settings_write": {
+        "title": "Cambiar tus etiquetas",
+        "body": "Añadir, renombrar y reordenar tus etiquetas, e impedir cambios en tu configuración."
+      },
+      "settings_change": {
         "title": "Cambiar tu configuración",
-        "body": "Añadir y reordenar etiquetas y cambiar tus preferencias."
+        "body": "Cambiar el aspecto y el funcionamiento de la aplicación, como el tema, el formato de hora o el panel de lectura. La configuración que estableció tu organización no cambia."
       },
       "security_read": {
         "title": "Ver la seguridad de tu cuenta",
@@ -5977,6 +5994,10 @@
         "title": "Añadir paneles a los detalles del mensaje",
         "body": "Mostrar su propio panel junto a un mensaje abierto o debajo de él."
       },
+      "ui_side_panel": {
+        "title": "Añadir un panel a otras vistas",
+        "body": "Mostrar su propio panel junto al Calendario, los Contactos, los Archivos y los Ajustes."
+      },
       "ui_download_file": {
         "title": "Guardar archivos en tu dispositivo",
         "body": "Ofrecer para descargar archivos que creó."
@@ -6037,6 +6058,10 @@
         "title": "Cambiar el mensaje que escribes",
         "body": "Sustituir o añadir texto en un mensaje mientras lo escribes, cuando usas el complemento en el editor. Puedes deshacer cada cambio y sigues decidiendo si lo envías."
       },
+      "compose_check": {
+        "title": "Revisar lo que escribe",
+        "body": "Lee lo que escribe en el editor mientras teclea y puede enviarlo al servicio que usa. Solo cuando la revisión está activada, y nada mientras un mensaje esté configurado para firmarse o cifrarse. El texto que escribió antes de activarlo puede que ya se haya revisado."
+      },
       "email_forward": {
         "title": "Reenviar tu correo",
         "body": "Reenviar mensajes de tu cuenta con sus adjuntos, sin abrir el editor. Se te pregunta antes del primer reenvío a cada dirección."
@@ -6055,7 +6080,7 @@
       },
       "ui_tasks": {
         "title": "Añadir a la vista de tareas",
-        "body": "Mostrar sus propias secciones en los detalles de una tarea y botones en la lista de tareas."
+        "body": "Mostrar sus propias secciones en los detalles de una tarea, botones en la lista de tareas y su propia lista de tareas en lugar de la de Bulwark."
       },
       "ui_files": {
         "title": "Añadir a la vista de archivos",
@@ -6354,6 +6379,77 @@
       "party_size": "Personas: {count}",
       "added_from": "Añadido desde un correo de {domain}",
       "added_from_subject": "Añadido desde el correo «{subject}» de {domain}"
+    }
+  },
+  "proofreading": {
+    "kind": {
+      "spelling": "Ortografía",
+      "grammar": "Gramática",
+      "style": "Estilo",
+      "other": "Sugerencia"
+    },
+    "popup": {
+      "label": "{kind}: {word}",
+      "no_suggestions": "No hay sugerencias",
+      "suggestions": "Sugerencias",
+      "replace_with": "Reemplazar por {text}",
+      "also": "También de {checker}",
+      "ignore": "Ignorar",
+      "add_to_dictionary": "Añadir al diccionario",
+      "disable_rule": "Desactivar esta regla",
+      "changed": "El texto ha cambiado. Espera a la siguiente revisión."
+    },
+    "list_item": "{word}: {message} Sugerencia: {suggestion}",
+    "list_item_no_suggestion": "{word}: {message}",
+    "announce_count": "{count, plural, =0 {No hay errores de ortografía ni de gramática} one {# error de ortografía o gramática} other {# errores de ortografía o gramática}}",
+    "status": {
+      "title": "Revisión",
+      "off": "Revisión desactivada",
+      "paused": "Revisión en pausa",
+      "rate_limited": "Comprobación en pausa",
+      "unavailable": "Comprobación no disponible",
+      "checking": "Comprobando…",
+      "issues": "{count, plural, =0 {Sin problemas} one {# problema} other {# problemas}}"
+    },
+    "panel": {
+      "title": "Revisión",
+      "required": "Exigido por tu organización",
+      "check_message": "Revisar este mensaje",
+      "notice": "Mientras escribes, el texto se envía a {checkers} para revisarlo. Tu firma y el mensaje citado quedan fuera. No se envía nada mientras un mensaje esté configurado para firmarse o cifrarse; lo que escribiste antes de activarlo puede que ya se haya revisado.",
+      "turn_on": "Activar la revisión",
+      "paused_protected": "No se revisa nada mientras este mensaje esté configurado para firmarse o cifrarse.",
+      "paused_unknown": "{plugin} puede firmar o cifrar mensajes sin mostrarlo aquí, así que no se revisa nada mientras esté activo.",
+      "rate_limited": "{checker} ha pedido esperar. La revisión se reanuda en un minuto.",
+      "unavailable": "{checker} no puede revisar ahora mismo. Lo vuelve a intentar cuando sigas escribiendo.",
+      "no_issues": "No se han encontrado problemas.",
+      "list_label": "Problemas en este mensaje",
+      "shortcuts": "Siguiente problema: {next}. Anterior: {previous}."
+    },
+    "notice": {
+      "on": "La revisión está activada. Mientras escribes, el texto se envía a {checkers} para revisarlo, sin tu firma ni el mensaje citado. No se envía nada mientras un mensaje esté configurado para firmarse o cifrarse; lo que escribiste antes puede que ya se haya revisado.",
+      "forced": "Tu organización ha activado la revisión. Mientras escribes, el texto se envía a {checkers} para revisarlo, sin tu firma ni el mensaje citado. No se envía nada mientras un mensaje esté configurado para firmarse o cifrarse; lo que escribiste antes puede que ya se haya revisado.",
+      "ok": "Aceptar"
+    },
+    "send_warning": {
+      "title": "¿Enviar con problemas pendientes?",
+      "body": "{count, plural, one {Queda # error de ortografía o gramática} other {Quedan # errores de ortografía o gramática}} sin resolver en este mensaje.",
+      "review": "Revisar",
+      "send": "Enviar de todos modos"
+    },
+    "settings": {
+      "title": "Revisión",
+      "description": "Subraya los errores de ortografía y gramática mientras escribes, con sugerencias para corregirlos.",
+      "enable": "Revisar la ortografía y la gramática mientras escribo",
+      "enable_description": "El texto que escribes se envía al complemento de revisión y al servicio que usa, sin tu firma ni los mensajes citados. No se envía nada mientras un mensaje esté configurado para firmarse o cifrarse.",
+      "no_checker": "No hay ningún complemento de revisión instalado. Pide a tu administrador que añada uno.",
+      "plugin_description": "Envía lo que escribes a {plugin}.",
+      "writing_language": "Idioma de escritura",
+      "writing_language_description": "El idioma en el que sueles escribir. Lo usan la revisión y el corrector ortográfico de tu navegador.",
+      "auto": "Detectar automáticamente"
+    },
+    "shortcuts": {
+      "next_issue": "Siguiente error de ortografía o gramática",
+      "previous_issue": "Anterior error de ortografía o gramática"
     }
   }
 }

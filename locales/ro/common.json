@@ -843,6 +843,7 @@
     "mv_position": "{index} din {total}",
     "plugin_panel_show": "Afișează panoul pluginului",
     "plugin_panel_hide": "Ascunde panoul pluginului",
+    "plugin_panel": "Panoul pluginului",
     "copy": "Copiază",
     "contact_added": "Contact adăugat",
     "save_to_files": {
@@ -1951,6 +1952,14 @@
         "description": "Unde să inserați semnătura în răspunsuri și redirecționări. Deasupra textului citat, semnătura se citește în mod natural ca o încheiere a răspunsului; sub text, mesajul original rămâne contiguu.",
         "above_quote": "Înaintea textului citat",
         "below_quote": "După textul între ghilimele"
+      },
+      "signature_new_mail": {
+        "label": "Semnătură la mesajele noi",
+        "description": "Inserează automat semnătura când compui un mesaj nou. Dezactivează pentru a începe fiecare mesaj nou fără ea."
+      },
+      "signature_reply_forward": {
+        "label": "Semnătură la răspunsuri și redirecționări",
+        "description": "Adaugă automat semnătura când răspunzi sau redirecționezi un mesaj. Dezactivează pentru a le trimite fără ea."
       },
       "signature_separator": {
         "label": "Delimitator de semnătură",
@@ -5830,8 +5839,8 @@
         "body": "Trimite mesaje complete, de exemplu semnate sau criptate, din contul dvs."
       },
       "email_blob_read": {
-        "title": "Citirea conținutului brut al mesajelor",
-        "body": "Citește datele originale ale mesajelor și atașamentelor dvs. și ale fiecărui fișier pe care îl atașați înainte de trimitere."
+        "title": "Citirea atașamentelor și a sursei mesajelor",
+        "body": "Citește atașamentele (inclusiv textul și imaginile lor) și sursa completă a mesajelor cu care lucrați, precum și fiecare fișier pe care îl atașați înainte de trimitere."
       },
       "email_blob_write": {
         "title": "Înlocuirea atașamentelor înainte de trimitere",
@@ -5849,6 +5858,10 @@
         "title": "Modificarea calendarului",
         "body": "Creează, modifică și șterge evenimente."
       },
+      "calendar_respond": {
+        "title": "Răspunsul la invitații",
+        "body": "Acceptă sau refuză invitații din calendar. Răspunsul dvs. ajunge la organizator prin e-mail."
+      },
       "contacts_read": {
         "title": "Citirea contactelor",
         "body": "Caută în agendele dvs. și le citește."
@@ -5859,11 +5872,11 @@
       },
       "files_read": {
         "title": "Citirea fișierelor",
-        "body": "Răsfoiește și deschide fișierele stocate în contul dvs."
+        "body": "Găsește, deschide și citește fișierele din contul dvs."
       },
       "files_write": {
         "title": "Modificarea fișierelor",
-        "body": "Încarcă, redenumește, mută și șterge fișiere din contul dvs."
+        "body": "Salvează, creează, redenumește și mută fișiere în contul dvs. și poate împiedica ștergerea unui fișier."
       },
       "identity_read": {
         "title": "Vizualizarea identităților de expediere",
@@ -5914,8 +5927,12 @@
         "body": "Vede preferințele dvs. și definițiile etichetelor."
       },
       "settings_write": {
+        "title": "Modificarea etichetelor",
+        "body": "Adaugă, redenumește și reordonează etichetele dvs. și blochează modificările setărilor dvs."
+      },
+      "settings_change": {
         "title": "Modificarea setărilor",
-        "body": "Adaugă și reordonează etichete și modifică preferințele dvs."
+        "body": "Modifică aspectul și funcționarea aplicației, de exemplu tema, formatul orei sau panoul de citire. Setările stabilite de organizația dvs. rămân neschimbate."
       },
       "security_read": {
         "title": "Vizualizarea securității contului",
@@ -5977,6 +5994,10 @@
         "title": "Adăugarea de panouri la detaliile mesajului",
         "body": "Afișează un panou propriu lângă sau sub un mesaj deschis."
       },
+      "ui_side_panel": {
+        "title": "Adăugarea unui panou în alte vizualizări",
+        "body": "Afișarea propriului panou lângă Calendar, Contacte, Fișiere și Setări."
+      },
       "ui_download_file": {
         "title": "Salvarea fișierelor pe dispozitiv",
         "body": "Oferă spre descărcare fișierele create de el."
@@ -6037,6 +6058,10 @@
         "title": "Modificarea mesajului pe care îl scrieți",
         "body": "Înlocuirea sau adăugarea de text într-un mesaj în timp ce îl scrieți, când folosiți pluginul în editor. Puteți anula fiecare modificare și decideți în continuare dacă îl trimiteți."
       },
+      "compose_check": {
+        "title": "Verificarea a ceea ce scrieți",
+        "body": "Citește ce scrieți în editor în timp ce tastați și poate trimite textul serviciului pe care îl folosește. Doar când verificarea este pornită și nimic cât timp un mesaj este setat să fie semnat sau criptat. Textul scris înainte de a activa asta poate fi deja verificat."
+      },
       "email_forward": {
         "title": "Redirecționarea mesajelor dvs.",
         "body": "Redirecționează mesaje din contul dvs. împreună cu atașamentele, fără a deschide editorul. Sunteți întrebat înainte de prima redirecționare către fiecare adresă."
@@ -6055,7 +6080,7 @@
       },
       "ui_tasks": {
         "title": "Adăugarea în vizualizarea sarcinilor",
-        "body": "Afișează secțiuni proprii în detaliile unei sarcini și butoane în lista de sarcini."
+        "body": "Afișează secțiuni proprii în detaliile unei sarcini, butoane în lista de sarcini și o listă de sarcini proprie în locul celei din Bulwark."
       },
       "ui_files": {
         "title": "Adăugarea în vizualizarea fișierelor",
@@ -6354,6 +6379,77 @@
       "party_size": "Număr de persoane: {count}",
       "added_from": "Adăugat dintr-un e-mail de la {domain}",
       "added_from_subject": "Adăugat din e-mailul „{subject}” de la {domain}"
+    }
+  },
+  "proofreading": {
+    "kind": {
+      "spelling": "Ortografie",
+      "grammar": "Gramatică",
+      "style": "Stil",
+      "other": "Sugestie"
+    },
+    "popup": {
+      "label": "{kind}: {word}",
+      "no_suggestions": "Nicio sugestie",
+      "suggestions": "Sugestii",
+      "replace_with": "Înlocuiește cu {text}",
+      "also": "Și de la {checker}",
+      "ignore": "Ignoră",
+      "add_to_dictionary": "Adaugă în dicționar",
+      "disable_rule": "Dezactivează această regulă",
+      "changed": "Textul s-a schimbat. Așteptați următoarea verificare."
+    },
+    "list_item": "{word}: {message} Sugestie: {suggestion}",
+    "list_item_no_suggestion": "{word}: {message}",
+    "announce_count": "{count, plural, =0 {Nicio greșeală de ortografie sau gramatică} one {# greșeală de ortografie sau gramatică} few {# greșeli de ortografie sau gramatică} other {# de greșeli de ortografie sau gramatică}}",
+    "status": {
+      "title": "Verificare text",
+      "off": "Verificarea textului este oprită",
+      "paused": "Verificarea textului este întreruptă",
+      "rate_limited": "Verificare întreruptă",
+      "unavailable": "Verificare indisponibilă",
+      "checking": "Se verifică…",
+      "issues": "{count, plural, =0 {Nicio problemă} one {# problemă} few {# probleme} other {# de probleme}}"
+    },
+    "panel": {
+      "title": "Verificare text",
+      "required": "Cerută de organizația dvs.",
+      "check_message": "Verifică acest mesaj",
+      "notice": "În timp ce tastați, textul scris ajunge la {checkers} pentru verificare. Semnătura și mesajul citat sunt lăsate deoparte. Nu se trimite nimic cât timp un mesaj este setat să fie semnat sau criptat; ce ați scris înainte de a activa asta poate fi deja verificat.",
+      "turn_on": "Pornește verificarea textului",
+      "paused_protected": "Nu se verifică nimic cât timp acest mesaj este setat să fie semnat sau criptat.",
+      "paused_unknown": "{plugin} poate semna sau cripta mesaje fără să arate asta aici, așa că nu se verifică nimic cât timp este pornit.",
+      "rate_limited": "{checker} a cerut o pauză. Verificarea reîncepe peste un minut.",
+      "unavailable": "{checker} nu poate verifica acum. Încearcă din nou când continuați să scrieți.",
+      "no_issues": "Nu s-au găsit probleme.",
+      "list_label": "Probleme în acest mesaj",
+      "shortcuts": "Problema următoare: {next}. Anterioara: {previous}."
+    },
+    "notice": {
+      "on": "Verificarea textului este pornită. În timp ce tastați, textul scris ajunge la {checkers} pentru verificare, fără semnătură și fără mesajul citat. Nu se trimite nimic cât timp un mesaj este setat să fie semnat sau criptat; ce ați scris înainte poate fi deja verificat.",
+      "forced": "Organizația dvs. a pornit verificarea textului. În timp ce tastați, textul scris ajunge la {checkers} pentru verificare, fără semnătură și fără mesajul citat. Nu se trimite nimic cât timp un mesaj este setat să fie semnat sau criptat; ce ați scris înainte poate fi deja verificat.",
+      "ok": "OK"
+    },
+    "send_warning": {
+      "title": "Trimiteți cu probleme nerezolvate?",
+      "body": "{count, plural, one {În acest mesaj a rămas # greșeală de ortografie sau gramatică.} few {În acest mesaj au rămas # greșeli de ortografie sau gramatică.} other {În acest mesaj au rămas # de greșeli de ortografie sau gramatică.}}",
+      "review": "Revizuiți",
+      "send": "Trimite oricum"
+    },
+    "settings": {
+      "title": "Verificare text",
+      "description": "Subliniază greșelile de ortografie și gramatică în timp ce scrieți, cu sugestii de corectare.",
+      "enable": "Verifică ortografia și gramatica în timp ce tastez",
+      "enable_description": "Textul pe care îl scrieți ajunge la suplimentul de verificare și la serviciul pe care îl folosește, fără semnătură și fără mesajele citate. Nu se trimite nimic cât timp un mesaj este setat să fie semnat sau criptat.",
+      "no_checker": "Nu este instalat niciun supliment de verificare a textului. Cereți administratorului să adauge unul.",
+      "plugin_description": "Trimite ce scrieți către {plugin}.",
+      "writing_language": "Limba de scriere",
+      "writing_language_description": "Limba în care scrieți de obicei. O folosesc verificarea textului și corectorul ortografic al browserului.",
+      "auto": "Detectează automat"
+    },
+    "shortcuts": {
+      "next_issue": "Următoarea greșeală de ortografie sau gramatică",
+      "previous_issue": "Greșeala de ortografie sau gramatică anterioară"
     }
   }
 }

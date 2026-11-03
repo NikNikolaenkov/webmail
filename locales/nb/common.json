@@ -843,6 +843,7 @@
     "mv_position": "{index} av {total}",
     "plugin_panel_show": "Vis tilleggspanel",
     "plugin_panel_hide": "Skjul tilleggspanel",
+    "plugin_panel": "Tilleggspanel",
     "copy": "Kopier",
     "contact_added": "Kontakt lagt til",
     "save_to_files": {
@@ -1951,6 +1952,14 @@
         "description": "Velg hvor signaturen skal settes inn i svar og videresendinger. Over den siterte teksten fungerer den som en naturlig avslutning på svaret. Under den siterte teksten holdes den opprinnelige meldingen samlet.",
         "above_quote": "Før sitert tekst",
         "below_quote": "Etter sitert tekst"
+      },
+      "signature_new_mail": {
+        "label": "Signatur på nye e-poster",
+        "description": "Setter automatisk inn signaturen din når du skriver en ny melding. Slå av for å starte hver ny melding uten."
+      },
+      "signature_reply_forward": {
+        "label": "Signatur på svar og videresendinger",
+        "description": "Legger automatisk til signaturen din når du svarer eller videresender. Slå av for å sende dem uten."
       },
       "signature_separator": {
         "label": "Signaturavgrensning",
@@ -5830,8 +5839,8 @@
         "body": "Sende ferdige meldinger, for eksempel signerte eller krypterte, fra kontoen din."
       },
       "email_blob_read": {
-        "title": "Lese råinnholdet i meldinger",
-        "body": "Lese de opprinnelige dataene i meldingene og vedleggene dine, og i hver fil du legger ved før den sendes."
+        "title": "Lese vedlegg og kilden til meldinger",
+        "body": "Lese vedlegg (også teksten og bildene i dem) og hele kilden til meldingene du jobber med, og hver fil du legger ved før den sendes."
       },
       "email_blob_write": {
         "title": "Erstatte vedlegg før sending",
@@ -5849,6 +5858,10 @@
         "title": "Endre kalenderen din",
         "body": "Opprette, endre og slette hendelser."
       },
+      "calendar_respond": {
+        "title": "Svare på invitasjoner",
+        "body": "Godta eller avslå kalenderinvitasjoner. Svaret ditt sendes til arrangøren på e-post."
+      },
       "contacts_read": {
         "title": "Lese kontaktene dine",
         "body": "Søke i og lese adressebøkene dine."
@@ -5859,11 +5872,11 @@
       },
       "files_read": {
         "title": "Lese filene dine",
-        "body": "Bla gjennom og åpne filene som er lagret på kontoen din."
+        "body": "Finne, åpne og lese filene på kontoen din."
       },
       "files_write": {
         "title": "Endre filene dine",
-        "body": "Laste opp, gi nytt navn til, flytte og slette filer på kontoen din."
+        "body": "Lagre, opprette, gi nytt navn til og flytte filer på kontoen din, og hindre at en fil blir slettet."
       },
       "identity_read": {
         "title": "Se avsenderidentitetene dine",
@@ -5914,8 +5927,12 @@
         "body": "Se innstillingene og etikettdefinisjonene dine."
       },
       "settings_write": {
+        "title": "Endre etikettene dine",
+        "body": "Legge til, gi nytt navn til og endre rekkefølgen på etikettene dine, og stoppe endringer i innstillingene dine."
+      },
+      "settings_change": {
         "title": "Endre innstillingene dine",
-        "body": "Legge til og endre rekkefølgen på etiketter og endre innstillingene dine."
+        "body": "Endre hvordan appen ser ut og fungerer, for eksempel tema, tidsformat eller leserute. Innstillinger som organisasjonen din har bestemt, forblir som de er."
       },
       "security_read": {
         "title": "Se kontosikkerheten din",
@@ -5977,6 +5994,10 @@
         "title": "Legge til paneler i meldingsdetaljene",
         "body": "Vise et eget panel ved siden av eller under en åpen melding."
       },
+      "ui_side_panel": {
+        "title": "Legg til et panel i andre visninger",
+        "body": "Vis sitt eget panel ved siden av Kalender, Kontakter, Filer og Innstillinger."
+      },
       "ui_download_file": {
         "title": "Lagre filer på enheten din",
         "body": "Tilby filer det har laget, for nedlasting."
@@ -6037,6 +6058,10 @@
         "title": "Endre meldingen du skriver",
         "body": "Erstatte eller legge til tekst i en melding mens du skriver den, når du bruker tillegget i redigeringsvinduet. Du kan angre hver endring, og du bestemmer fortsatt om den skal sendes."
       },
+      "compose_check": {
+        "title": "Sjekke det du skriver",
+        "body": "Leser det du skriver i redigeringsvinduet mens du skriver, og kan sende det til tjenesten det bruker. Bare når korrekturen er slått på, og ingenting så lenge en melding er satt til å bli signert eller kryptert. Tekst du skrev før du slo det på, kan allerede være sjekket."
+      },
       "email_forward": {
         "title": "Videresende e-posten din",
         "body": "Videresende meldinger fra kontoen din med vedlegg, uten å åpne redigeringsvinduet. Du blir spurt før første videresending til hver adresse."
@@ -6055,7 +6080,7 @@
       },
       "ui_tasks": {
         "title": "Legge til i oppgavevisningen",
-        "body": "Vise egne seksjoner i detaljene for en oppgave og knapper i oppgavelisten."
+        "body": "Vise egne seksjoner i detaljene for en oppgave, knapper i oppgavelisten og en egen oppgaveliste i stedet for Bulwarks."
       },
       "ui_files": {
         "title": "Legge til i filvisningen",
@@ -6354,6 +6379,77 @@
       "party_size": "Antall personer: {count}",
       "added_from": "Lagt til fra en e-post fra {domain}",
       "added_from_subject": "Lagt til fra e-posten «{subject}» fra {domain}"
+    }
+  },
+  "proofreading": {
+    "kind": {
+      "spelling": "Stavemåte",
+      "grammar": "Grammatikk",
+      "style": "Stil",
+      "other": "Forslag"
+    },
+    "popup": {
+      "label": "{kind}: {word}",
+      "no_suggestions": "Ingen forslag",
+      "suggestions": "Forslag",
+      "replace_with": "Erstatt med {text}",
+      "also": "Også fra {checker}",
+      "ignore": "Ignorer",
+      "add_to_dictionary": "Legg til i ordboken",
+      "disable_rule": "Slå av denne regelen",
+      "changed": "Teksten er endret. Vent på neste sjekk."
+    },
+    "list_item": "{word}: {message} Forslag: {suggestion}",
+    "list_item_no_suggestion": "{word}: {message}",
+    "announce_count": "{count, plural, =0 {Ingen stave- eller grammatikkfeil} one {# stave- eller grammatikkfeil} other {# stave- eller grammatikkfeil}}",
+    "status": {
+      "title": "Korrektur",
+      "off": "Korrektur av",
+      "paused": "Korrektur satt på pause",
+      "rate_limited": "Sjekk satt på pause",
+      "unavailable": "Sjekk utilgjengelig",
+      "checking": "Sjekker…",
+      "issues": "{count, plural, =0 {Ingen problemer} one {# problem} other {# problemer}}"
+    },
+    "panel": {
+      "title": "Korrektur",
+      "required": "Påkrevd av organisasjonen din",
+      "check_message": "Sjekk denne meldingen",
+      "notice": "Mens du skriver, sendes teksten til {checkers} for å bli sjekket. Signaturen din og den siterte meldingen holdes utenfor. Ingenting sendes så lenge en melding er satt til å bli signert eller kryptert; det du skrev før du slo det på, kan allerede være sjekket.",
+      "turn_on": "Slå på korrektur",
+      "paused_protected": "Ingenting sjekkes så lenge denne meldingen er satt til å bli signert eller kryptert.",
+      "paused_unknown": "{plugin} kan signere eller kryptere meldinger uten å vise det her, så ingenting sjekkes mens det er på.",
+      "rate_limited": "{checker} ba om å vente. Sjekkingen starter igjen om et minutt.",
+      "unavailable": "{checker} kan ikke sjekke akkurat nå. Det prøver igjen når du skriver videre.",
+      "no_issues": "Fant ingen problemer.",
+      "list_label": "Problemer i denne meldingen",
+      "shortcuts": "Neste problem: {next}. Forrige: {previous}."
+    },
+    "notice": {
+      "on": "Korrektur er på. Mens du skriver, sendes teksten til {checkers} for å bli sjekket, uten signaturen din eller den siterte meldingen. Ingenting sendes så lenge en melding er satt til å bli signert eller kryptert; det du skrev før det, kan allerede være sjekket.",
+      "forced": "Organisasjonen din har slått på korrektur. Mens du skriver, sendes teksten til {checkers} for å bli sjekket, uten signaturen din eller den siterte meldingen. Ingenting sendes så lenge en melding er satt til å bli signert eller kryptert; det du skrev før det, kan allerede være sjekket.",
+      "ok": "OK"
+    },
+    "send_warning": {
+      "title": "Sende med åpne problemer?",
+      "body": "{count, plural, one {# stave- eller grammatikkfeil er fortsatt åpen} other {# stave- eller grammatikkfeil er fortsatt åpne}} i denne meldingen.",
+      "review": "Gå gjennom",
+      "send": "Send likevel"
+    },
+    "settings": {
+      "title": "Korrektur",
+      "description": "Understrek stave- og grammatikkfeil mens du skriver, med forslag til å rette dem.",
+      "enable": "Sjekk stavemåte og grammatikk mens jeg skriver",
+      "enable_description": "Teksten du skriver, sendes til korrekturtillegget og tjenesten det bruker, uten signaturen din eller siterte meldinger. Ingenting sendes så lenge en melding er satt til å bli signert eller kryptert.",
+      "no_checker": "Ingen korrekturtillegg er installert. Be administratoren din om å legge til et.",
+      "plugin_description": "Sender det du skriver, til {plugin}.",
+      "writing_language": "Skrivespråk",
+      "writing_language_description": "Språket du vanligvis skriver på. Korrekturen og stavekontrollen i nettleseren din bruker det.",
+      "auto": "Oppdag automatisk"
+    },
+    "shortcuts": {
+      "next_issue": "Neste stave- eller grammatikkfeil",
+      "previous_issue": "Forrige stave- eller grammatikkfeil"
     }
   }
 }

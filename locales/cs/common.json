@@ -843,6 +843,7 @@
     "mv_position": "{index} z {total}",
     "plugin_panel_show": "Zobrazit panel pluginu",
     "plugin_panel_hide": "Skrýt panel pluginu",
+    "plugin_panel": "Panel pluginu",
     "copy": "Kopírovat",
     "contact_added": "Kontakt přidán",
     "save_to_files": {
@@ -1948,6 +1949,14 @@
         "description": "Kam vložit podpis v odpovědích a přeposláních. Nad citovaným textem působí přirozeně jako zakončení odpovědi; pod ním zachovává původní zprávu vcelku.",
         "above_quote": "Před citovaným textem",
         "below_quote": "Za citovaným textem"
+      },
+      "signature_new_mail": {
+        "label": "Podpis u nových zpráv",
+        "description": "Při psaní nové zprávy automaticky vloží váš podpis. Vypněte, pokud chcete každou novou zprávu začínat bez podpisu."
+      },
+      "signature_reply_forward": {
+        "label": "Podpis u odpovědí a přeposílání",
+        "description": "Při odpovídání nebo přeposílání automaticky připojí váš podpis. Vypněte, pokud je chcete odesílat bez podpisu."
       },
       "signature_separator": {
         "label": "Oddělovač podpisu",
@@ -5830,8 +5839,8 @@
         "body": "Odesílá z vašeho účtu kompletní zprávy, například podepsané nebo šifrované."
       },
       "email_blob_read": {
-        "title": "Číst nezpracovaný obsah zpráv",
-        "body": "Čte původní data vašich zpráv a příloh i každého souboru, který připojíte před odesláním."
+        "title": "Číst přílohy a zdroj zpráv",
+        "body": "Čte přílohy (i jejich text a obrázky) a celý zdroj zpráv, se kterými pracujete, i každý soubor, který připojíte před odesláním."
       },
       "email_blob_write": {
         "title": "Nahrazovat přílohy před odesláním",
@@ -5849,6 +5858,10 @@
         "title": "Měnit váš kalendář",
         "body": "Vytváří, mění a maže události."
       },
+      "calendar_respond": {
+        "title": "Odpovídat na pozvánky",
+        "body": "Přijímá nebo odmítá pozvánky v kalendáři. Vaše odpověď se odešle organizátorovi e-mailem."
+      },
       "contacts_read": {
         "title": "Číst vaše kontakty",
         "body": "Prohledává a čte vaše adresáře."
@@ -5859,11 +5872,11 @@
       },
       "files_read": {
         "title": "Číst vaše soubory",
-        "body": "Prochází a otevírá soubory uložené ve vašem účtu."
+        "body": "Hledat, otevírat a číst soubory ve vašem účtu."
       },
       "files_write": {
         "title": "Měnit vaše soubory",
-        "body": "Nahrává, přejmenovává, přesouvá a maže soubory ve vašem účtu."
+        "body": "Ukládat, vytvářet, přejmenovávat a přesouvat soubory ve vašem účtu a zabránit smazání souboru."
       },
       "identity_read": {
         "title": "Vidět vaše identity odesílatele",
@@ -5914,8 +5927,12 @@
         "body": "Vidí vaše předvolby a definice štítků."
       },
       "settings_write": {
+        "title": "Měnit vaše štítky",
+        "body": "Přidává a přejmenovává vaše štítky, mění jejich pořadí a brání změnám vašeho nastavení."
+      },
+      "settings_change": {
         "title": "Měnit vaše nastavení",
-        "body": "Přidává štítky, mění jejich pořadí a mění vaše předvolby."
+        "body": "Mění vzhled a chování aplikace, například motiv, formát času nebo panel čtení. Nastavení určená vaší organizací zůstanou beze změny."
       },
       "security_read": {
         "title": "Vidět zabezpečení účtu",
@@ -5977,6 +5994,10 @@
         "title": "Přidávat panely do podrobností zprávy",
         "body": "Zobrazuje vlastní panel vedle otevřené zprávy nebo pod ní."
       },
+      "ui_side_panel": {
+        "title": "Přidat panel do dalších zobrazení",
+        "body": "Zobrazit vlastní panel vedle Kalendáře, Kontaktů, Souborů a Nastavení."
+      },
       "ui_download_file": {
         "title": "Ukládat soubory do zařízení",
         "body": "Nabízí ke stažení soubory, které vytvořil."
@@ -6037,6 +6058,10 @@
         "title": "Měnit zprávu, kterou píšete",
         "body": "Nahrazovat nebo přidávat text ve zprávě během psaní, když plugin použijete v editoru. Každou změnu můžete vrátit a o odeslání stále rozhodujete vy."
       },
+      "compose_check": {
+        "title": "Kontrolovat, co píšete",
+        "body": "Čte, co píšete v editoru, během psaní a může to posílat službě, kterou používá. Jen když je kontrola zapnutá, a nic, dokud je zpráva nastavená k podepsání nebo zašifrování. Text, který jste napsali, než jste to zapnuli, už mohl být zkontrolován."
+      },
       "email_forward": {
         "title": "Přeposílat vaši poštu",
         "body": "Přeposílá zprávy z vašeho účtu i s přílohami, aniž by otevřel editor. Před prvním přeposláním na každou adresu se vás zeptá."
@@ -6055,7 +6080,7 @@
       },
       "ui_tasks": {
         "title": "Přidávat obsah do sekce Úkoly",
-        "body": "Zobrazuje vlastní sekce v podrobnostech úkolu a tlačítka v seznamu úkolů."
+        "body": "Zobrazuje vlastní sekce v podrobnostech úkolu, tlačítka v seznamu úkolů a vlastní seznam úkolů místo seznamu Bulwarku."
       },
       "ui_files": {
         "title": "Přidávat obsah do sekce Soubory",
@@ -6354,6 +6379,77 @@
       "party_size": "Počet osob: {count}",
       "added_from": "Přidáno z e-mailu od {domain}",
       "added_from_subject": "Přidáno z e-mailu „{subject}“ od {domain}"
+    }
+  },
+  "proofreading": {
+    "kind": {
+      "spelling": "Pravopis",
+      "grammar": "Gramatika",
+      "style": "Styl",
+      "other": "Návrh"
+    },
+    "popup": {
+      "label": "{kind}: {word}",
+      "no_suggestions": "Žádné návrhy",
+      "suggestions": "Návrhy",
+      "replace_with": "Nahradit za {text}",
+      "also": "Také od {checker}",
+      "ignore": "Ignorovat",
+      "add_to_dictionary": "Přidat do slovníku",
+      "disable_rule": "Vypnout toto pravidlo",
+      "changed": "Text se změnil. Počkejte na další kontrolu."
+    },
+    "list_item": "{word}: {message} Návrh: {suggestion}",
+    "list_item_no_suggestion": "{word}: {message}",
+    "announce_count": "{count, plural, =0 {Žádné pravopisné ani gramatické chyby} one {# pravopisná nebo gramatická chyba} few {# pravopisné nebo gramatické chyby} many {# pravopisné nebo gramatické chyby} other {# pravopisných nebo gramatických chyb}}",
+    "status": {
+      "title": "Kontrola textu",
+      "off": "Kontrola textu vypnuta",
+      "paused": "Kontrola textu pozastavena",
+      "rate_limited": "Kontrola pozastavena",
+      "unavailable": "Kontrola není k dispozici",
+      "checking": "Kontroluje se…",
+      "issues": "{count, plural, =0 {Žádné problémy} one {# problém} few {# problémy} many {# problému} other {# problémů}}"
+    },
+    "panel": {
+      "title": "Kontrola textu",
+      "required": "Vyžaduje vaše organizace",
+      "check_message": "Zkontrolovat tuto zprávu",
+      "notice": "Během psaní se váš text posílá ke kontrole službě {checkers}. Váš podpis a citovaná zpráva se vynechávají. Dokud je zpráva nastavená k podepsání nebo zašifrování, neposílá se nic; co jste napsali předtím, než jste to zapnuli, už mohlo být zkontrolováno.",
+      "turn_on": "Zapnout kontrolu textu",
+      "paused_protected": "Dokud je tato zpráva nastavená k podepsání nebo zašifrování, nic se nekontroluje.",
+      "paused_unknown": "{plugin} může podepisovat nebo šifrovat zprávy, aniž by se to zde zobrazilo, proto se nic nekontroluje, dokud je zapnutý.",
+      "rate_limited": "{checker} požádal o počkání. Kontrola se znovu spustí za minutu.",
+      "unavailable": "{checker} teď nemůže kontrolovat. Zkusí to znovu, až budete pokračovat v psaní.",
+      "no_issues": "Nebyly nalezeny žádné problémy.",
+      "list_label": "Problémy v této zprávě",
+      "shortcuts": "Další problém: {next}. Předchozí: {previous}."
+    },
+    "notice": {
+      "on": "Kontrola textu je zapnutá. Během psaní se váš text posílá ke kontrole službě {checkers}, bez vašeho podpisu a citované zprávy. Dokud je zpráva nastavená k podepsání nebo zašifrování, neposílá se nic; co jste napsali předtím, už mohlo být zkontrolováno.",
+      "forced": "Vaše organizace zapnula kontrolu textu. Během psaní se váš text posílá ke kontrole službě {checkers}, bez vašeho podpisu a citované zprávy. Dokud je zpráva nastavená k podepsání nebo zašifrování, neposílá se nic; co jste napsali předtím, už mohlo být zkontrolováno.",
+      "ok": "OK"
+    },
+    "send_warning": {
+      "title": "Odeslat s nevyřešenými problémy?",
+      "body": "{count, plural, one {V této zprávě zůstává # nevyřešená pravopisná nebo gramatická chyba.} few {V této zprávě zůstávají # nevyřešené pravopisné nebo gramatické chyby.} many {V této zprávě zůstává # nevyřešené pravopisné nebo gramatické chyby.} other {V této zprávě zůstává # nevyřešených pravopisných nebo gramatických chyb.}}",
+      "review": "Zkontrolovat",
+      "send": "Přesto odeslat"
+    },
+    "settings": {
+      "title": "Kontrola textu",
+      "description": "Podtrhává pravopisné a gramatické chyby během psaní a nabízí návrhy na opravu.",
+      "enable": "Kontrolovat pravopis a gramatiku během psaní",
+      "enable_description": "Text, který píšete, se posílá doplňku pro kontrolu textu a službě, kterou používá, bez vašeho podpisu a citovaných zpráv. Dokud je zpráva nastavená k podepsání nebo zašifrování, neposílá se nic.",
+      "no_checker": "Není nainstalovaný žádný doplněk pro kontrolu textu. Požádejte správce, aby nějaký přidal.",
+      "plugin_description": "Posílá, co píšete, do {plugin}.",
+      "writing_language": "Jazyk psaní",
+      "writing_language_description": "Jazyk, ve kterém obvykle píšete. Používá ho kontrola textu i kontrola pravopisu ve vašem prohlížeči.",
+      "auto": "Rozpoznat automaticky"
+    },
+    "shortcuts": {
+      "next_issue": "Další pravopisná nebo gramatická chyba",
+      "previous_issue": "Předchozí pravopisná nebo gramatická chyba"
     }
   }
 }

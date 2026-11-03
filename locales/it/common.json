@@ -843,6 +843,7 @@
     "mv_position": "{index} di {total}",
     "plugin_panel_show": "Mostra il pannello del plugin",
     "plugin_panel_hide": "Nascondi il pannello del plugin",
+    "plugin_panel": "Pannello del plugin",
     "copy": "Copia",
     "contact_added": "Contatto aggiunto",
     "save_to_files": {
@@ -1939,6 +1940,14 @@
         "description": "Dove inserire la tua firma nelle risposte e negli inoltri. Sopra il testo citato si legge in modo naturale come chiusura della risposta; sotto mantiene il messaggio originale contiguo.",
         "above_quote": "Prima del testo citato",
         "below_quote": "Dopo il testo citato"
+      },
+      "signature_new_mail": {
+        "label": "Firma sui nuovi messaggi",
+        "description": "Inserisce automaticamente la firma quando componi un nuovo messaggio. Disattiva per iniziare ogni nuovo messaggio senza."
+      },
+      "signature_reply_forward": {
+        "label": "Firma su risposte e inoltri",
+        "description": "Aggiunge automaticamente la firma quando rispondi o inoltri un messaggio. Disattiva per inviarli senza."
       },
       "signature_separator": {
         "label": "Delimitatore firma",
@@ -5830,8 +5839,8 @@
         "body": "Inviare messaggi completi, ad esempio firmati o cifrati, dal tuo account."
       },
       "email_blob_read": {
-        "title": "Leggere il contenuto grezzo dei messaggi",
-        "body": "Leggere i dati originali dei tuoi messaggi e allegati, e di ogni file che alleghi prima dell'invio."
+        "title": "Leggere gli allegati e il sorgente dei messaggi",
+        "body": "Leggere gli allegati (anche il loro testo e le loro immagini) e il sorgente completo dei messaggi su cui lavori, e ogni file che alleghi prima dell'invio."
       },
       "email_blob_write": {
         "title": "Sostituire gli allegati prima dell'invio",
@@ -5849,6 +5858,10 @@
         "title": "Modificare il tuo calendario",
         "body": "Creare, modificare ed eliminare eventi."
       },
+      "calendar_respond": {
+        "title": "Rispondere agli inviti",
+        "body": "Accettare o rifiutare inviti del calendario. La tua risposta arriva all'organizzatore via email."
+      },
       "contacts_read": {
         "title": "Leggere i tuoi contatti",
         "body": "Cercare e leggere nelle tue rubriche."
@@ -5859,11 +5872,11 @@
       },
       "files_read": {
         "title": "Leggere i tuoi file",
-        "body": "Sfogliare e aprire i file salvati nel tuo account."
+        "body": "Cercare, aprire e leggere i file del tuo account."
       },
       "files_write": {
         "title": "Modificare i tuoi file",
-        "body": "Caricare, rinominare, spostare ed eliminare file nel tuo account."
+        "body": "Salvare, creare, rinominare e spostare file nel tuo account e impedire che un file venga eliminato."
       },
       "identity_read": {
         "title": "Vedere i tuoi indirizzi mittente",
@@ -5914,8 +5927,12 @@
         "body": "Vedere le tue preferenze e le definizioni delle etichette."
       },
       "settings_write": {
+        "title": "Modificare le tue etichette",
+        "body": "Aggiungere, rinominare e riordinare le tue etichette e bloccare le modifiche alle tue impostazioni."
+      },
+      "settings_change": {
         "title": "Modificare le tue impostazioni",
-        "body": "Aggiungere e riordinare etichette e modificare le tue preferenze."
+        "body": "Modificare l'aspetto e il funzionamento dell'app, come il tema, il formato dell'ora o il pannello di lettura. Le impostazioni definite dalla tua organizzazione restano invariate."
       },
       "security_read": {
         "title": "Vedere la sicurezza del tuo account",
@@ -5977,6 +5994,10 @@
         "title": "Aggiungere pannelli ai dettagli del messaggio",
         "body": "Mostrare un proprio pannello accanto o sotto un messaggio aperto."
       },
+      "ui_side_panel": {
+        "title": "Aggiungere un pannello ad altre viste",
+        "body": "Mostrare un proprio pannello accanto a Calendario, Contatti, File e Impostazioni."
+      },
       "ui_download_file": {
         "title": "Salvare file sul tuo dispositivo",
         "body": "Offrire in download i file che ha creato."
@@ -6037,6 +6058,10 @@
         "title": "Modificare il messaggio che stai scrivendo",
         "body": "Sostituire o aggiungere testo in un messaggio mentre lo scrivi, quando usi il plugin nell'editor. Puoi annullare ogni modifica e decidi sempre tu se inviarlo."
       },
+      "compose_check": {
+        "title": "Controllare ciò che scrivi",
+        "body": "Legge ciò che scrivi nell'editor mentre digiti e può inviarlo al servizio che usa. Solo quando la correzione è attiva, e nulla finché un messaggio è impostato per essere firmato o cifrato. Il testo scritto prima di attivarlo potrebbe essere già stato controllato."
+      },
       "email_forward": {
         "title": "Inoltrare la tua posta",
         "body": "Inoltrare messaggi dal tuo account con i loro allegati, senza aprire l'editor. Ti viene chiesto prima del primo inoltro a ciascun indirizzo."
@@ -6055,7 +6080,7 @@
       },
       "ui_tasks": {
         "title": "Aggiungere elementi alla vista attività",
-        "body": "Mostrare le proprie sezioni nei dettagli di un'attività e pulsanti nell'elenco delle attività."
+        "body": "Mostrare le proprie sezioni nei dettagli di un'attività, pulsanti nell'elenco delle attività e un proprio elenco delle attività al posto di quello di Bulwark."
       },
       "ui_files": {
         "title": "Aggiungere elementi alla vista file",
@@ -6354,6 +6379,77 @@
       "party_size": "Persone: {count}",
       "added_from": "Aggiunto da un’e-mail di {domain}",
       "added_from_subject": "Aggiunto dall’e-mail «{subject}» di {domain}"
+    }
+  },
+  "proofreading": {
+    "kind": {
+      "spelling": "Ortografia",
+      "grammar": "Grammatica",
+      "style": "Stile",
+      "other": "Suggerimento"
+    },
+    "popup": {
+      "label": "{kind}: {word}",
+      "no_suggestions": "Nessun suggerimento",
+      "suggestions": "Suggerimenti",
+      "replace_with": "Sostituisci con {text}",
+      "also": "Anche da {checker}",
+      "ignore": "Ignora",
+      "add_to_dictionary": "Aggiungi al dizionario",
+      "disable_rule": "Disattiva questa regola",
+      "changed": "Il testo è cambiato. Attendi il prossimo controllo."
+    },
+    "list_item": "{word}: {message} Suggerimento: {suggestion}",
+    "list_item_no_suggestion": "{word}: {message}",
+    "announce_count": "{count, plural, =0 {Nessun errore di ortografia o grammatica} one {# errore di ortografia o grammatica} other {# errori di ortografia o grammatica}}",
+    "status": {
+      "title": "Correzione",
+      "off": "Correzione disattivata",
+      "paused": "Correzione in pausa",
+      "rate_limited": "Controllo in pausa",
+      "unavailable": "Controllo non disponibile",
+      "checking": "Controllo in corso…",
+      "issues": "{count, plural, =0 {Nessun problema} one {# problema} other {# problemi}}"
+    },
+    "panel": {
+      "title": "Correzione",
+      "required": "Richiesto dalla tua organizzazione",
+      "check_message": "Controlla questo messaggio",
+      "notice": "Mentre digiti, il testo che scrivi viene inviato a {checkers} per il controllo. La tua firma e il messaggio citato sono esclusi. Non viene inviato nulla finché un messaggio è impostato per essere firmato o cifrato; ciò che hai scritto prima di attivarlo potrebbe essere già stato controllato.",
+      "turn_on": "Attiva la correzione",
+      "paused_protected": "Non viene controllato nulla finché questo messaggio è impostato per essere firmato o cifrato.",
+      "paused_unknown": "{plugin} può firmare o cifrare i messaggi senza mostrarlo qui, quindi non viene controllato nulla finché è attivo.",
+      "rate_limited": "{checker} ha chiesto di attendere. Il controllo riprende tra un minuto.",
+      "unavailable": "{checker} non può controllare in questo momento. Riprova quando continui a scrivere.",
+      "no_issues": "Nessun problema trovato.",
+      "list_label": "Problemi in questo messaggio",
+      "shortcuts": "Problema successivo: {next}. Precedente: {previous}."
+    },
+    "notice": {
+      "on": "La correzione è attiva. Mentre digiti, il testo che scrivi viene inviato a {checkers} per il controllo, senza la tua firma né il messaggio citato. Non viene inviato nulla finché un messaggio è impostato per essere firmato o cifrato; ciò che hai scritto prima potrebbe essere già stato controllato.",
+      "forced": "La tua organizzazione ha attivato la correzione. Mentre digiti, il testo che scrivi viene inviato a {checkers} per il controllo, senza la tua firma né il messaggio citato. Non viene inviato nulla finché un messaggio è impostato per essere firmato o cifrato; ciò che hai scritto prima potrebbe essere già stato controllato.",
+      "ok": "OK"
+    },
+    "send_warning": {
+      "title": "Inviare con problemi aperti?",
+      "body": "{count, plural, one {# errore di ortografia o grammatica è ancora aperto} other {# errori di ortografia o grammatica sono ancora aperti}} in questo messaggio.",
+      "review": "Rivedi",
+      "send": "Invia comunque"
+    },
+    "settings": {
+      "title": "Correzione",
+      "description": "Sottolinea gli errori di ortografia e grammatica mentre scrivi, con suggerimenti per correggerli.",
+      "enable": "Controlla ortografia e grammatica mentre digito",
+      "enable_description": "Il testo che scrivi viene inviato al componente aggiuntivo di correzione e al servizio che usa, senza la tua firma né i messaggi citati. Non viene inviato nulla finché un messaggio è impostato per essere firmato o cifrato.",
+      "no_checker": "Nessun componente aggiuntivo di correzione installato. Chiedi all'amministratore di aggiungerne uno.",
+      "plugin_description": "Invia ciò che scrivi a {plugin}.",
+      "writing_language": "Lingua di scrittura",
+      "writing_language_description": "La lingua in cui scrivi di solito. La usano la correzione e il controllo ortografico del browser.",
+      "auto": "Rileva automaticamente"
+    },
+    "shortcuts": {
+      "next_issue": "Errore di ortografia o grammatica successivo",
+      "previous_issue": "Errore di ortografia o grammatica precedente"
     }
   }
 }

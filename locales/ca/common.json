@@ -843,6 +843,7 @@
     "mv_position": "{index} de {total}",
     "plugin_panel_show": "Mostra el tauler del connector",
     "plugin_panel_hide": "Amaga el tauler del connector",
+    "plugin_panel": "Tauler del connector",
     "copy": "Copia",
     "contact_added": "S'ha afegit el contacte",
     "save_to_files": {
@@ -1951,6 +1952,14 @@
         "description": "On inserir la signatura a les respostes i reenviaments. Abans del text citat es llegeix de manera natural com a tancament de la resposta; després manté el missatge original contigu.",
         "above_quote": "Abans del text citat",
         "below_quote": "Després del text citat"
+      },
+      "signature_new_mail": {
+        "label": "Signatura als correus nous",
+        "description": "Insereix automàticament la teva signatura en redactar un missatge nou. Desactiva-ho per començar cada missatge nou sense ella."
+      },
+      "signature_reply_forward": {
+        "label": "Signatura en respostes i reenviaments",
+        "description": "Afegeix automàticament la teva signatura en respondre o reenviar un missatge. Desactiva-ho per enviar-los sense ella."
       },
       "signature_separator": {
         "label": "Delimitador de la signatura",
@@ -5830,8 +5839,8 @@
         "body": "Enviar missatges complets, per exemple signats o xifrats, des del vostre compte."
       },
       "email_blob_read": {
-        "title": "Llegir el contingut original dels missatges",
-        "body": "Llegir les dades originals dels vostres missatges i adjunts, i de cada fitxer que adjunteu abans d'enviar-lo."
+        "title": "Llegir els adjunts i el codi font dels missatges",
+        "body": "Llegir els adjunts (també el seu text i les seves imatges) i el codi font complet dels missatges amb què treballeu, i cada fitxer que adjunteu abans d'enviar-lo."
       },
       "email_blob_write": {
         "title": "Substituir adjunts abans d'enviar",
@@ -5849,6 +5858,10 @@
         "title": "Canviar el vostre calendari",
         "body": "Crear, canviar i suprimir esdeveniments."
       },
+      "calendar_respond": {
+        "title": "Respondre invitacions",
+        "body": "Acceptar o rebutjar invitacions de calendari. La vostra resposta s'envia a l'organitzador per correu electrònic."
+      },
       "contacts_read": {
         "title": "Llegir els vostres contactes",
         "body": "Cercar i llegir les vostres llibretes d'adreces."
@@ -5859,11 +5872,11 @@
       },
       "files_read": {
         "title": "Llegir els vostres fitxers",
-        "body": "Navegar pels fitxers desats al vostre compte i obrir-los."
+        "body": "Cercar, obrir i llegir els fitxers del vostre compte."
       },
       "files_write": {
         "title": "Canviar els vostres fitxers",
-        "body": "Pujar, canviar el nom, moure i suprimir fitxers del vostre compte."
+        "body": "Desar, crear, canviar el nom i moure fitxers del vostre compte, i impedir que se suprimeixi un fitxer."
       },
       "identity_read": {
         "title": "Veure les vostres identitats d'enviament",
@@ -5914,8 +5927,12 @@
         "body": "Veure les vostres preferències i les definicions d'etiquetes."
       },
       "settings_write": {
+        "title": "Canviar les vostres etiquetes",
+        "body": "Afegir, canviar el nom i reordenar les vostres etiquetes, i impedir canvis a la vostra configuració."
+      },
+      "settings_change": {
         "title": "Canviar la vostra configuració",
-        "body": "Afegir i reordenar etiquetes i canviar les vostres preferències."
+        "body": "Canviar l'aspecte i el funcionament de l'aplicació, com ara el tema, el format d'hora o la subfinestra de lectura. La configuració que ha establert la vostra organització es manté igual."
       },
       "security_read": {
         "title": "Veure la seguretat del compte",
@@ -5977,6 +5994,10 @@
         "title": "Afegir panells als detalls del missatge",
         "body": "Mostrar un panell propi al costat o a sota d'un missatge obert."
       },
+      "ui_side_panel": {
+        "title": "Afegir un tauler a altres vistes",
+        "body": "Mostrar el seu propi tauler al costat del Calendari, els Contactes, els Fitxers i la Configuració."
+      },
       "ui_download_file": {
         "title": "Desar fitxers al dispositiu",
         "body": "Oferir per baixar fitxers que ha creat."
@@ -6037,6 +6058,10 @@
         "title": "Canviar el missatge que escriviu",
         "body": "Substituir o afegir text en un missatge mentre l'escriviu, quan feu servir el connector a l'editor. Podeu desfer cada canvi i continueu decidint si l'envieu."
       },
+      "compose_check": {
+        "title": "Revisar el que escriviu",
+        "body": "Llegeix el que escriviu a l'editor mentre teclegeu i ho pot enviar al servei que fa servir. Només quan la revisió està activada, i res mentre un missatge estigui configurat per signar-se o xifrar-se. El text que heu escrit abans d'activar-ho potser ja s'ha revisat."
+      },
       "email_forward": {
         "title": "Reenviar el vostre correu",
         "body": "Reenviar missatges del vostre compte amb els adjunts, sense obrir l'editor. Se us pregunta abans del primer reenviament a cada adreça."
@@ -6055,7 +6080,7 @@
       },
       "ui_tasks": {
         "title": "Afegir elements a la vista de tasques",
-        "body": "Mostrar seccions pròpies als detalls d'una tasca i botons a la llista de tasques."
+        "body": "Mostrar seccions pròpies als detalls d'una tasca, botons a la llista de tasques i una llista de tasques pròpia en lloc de la de Bulwark."
       },
       "ui_files": {
         "title": "Afegir elements a la vista de fitxers",
@@ -6354,6 +6379,77 @@
       "party_size": "Persones: {count}",
       "added_from": "Afegit des d’un correu de {domain}",
       "added_from_subject": "Afegit des del correu «{subject}» de {domain}"
+    }
+  },
+  "proofreading": {
+    "kind": {
+      "spelling": "Ortografia",
+      "grammar": "Gramàtica",
+      "style": "Estil",
+      "other": "Suggeriment"
+    },
+    "popup": {
+      "label": "{kind}: {word}",
+      "no_suggestions": "No hi ha suggeriments",
+      "suggestions": "Suggeriments",
+      "replace_with": "Substitueix per {text}",
+      "also": "També de {checker}",
+      "ignore": "Ignora",
+      "add_to_dictionary": "Afegeix al diccionari",
+      "disable_rule": "Desactiva aquesta regla",
+      "changed": "El text ha canviat. Espereu la propera revisió."
+    },
+    "list_item": "{word}: {message} Suggeriment: {suggestion}",
+    "list_item_no_suggestion": "{word}: {message}",
+    "announce_count": "{count, plural, =0 {No hi ha errors d'ortografia ni de gramàtica} one {# error d'ortografia o de gramàtica} other {# errors d'ortografia o de gramàtica}}",
+    "status": {
+      "title": "Revisió",
+      "off": "Revisió desactivada",
+      "paused": "Revisió en pausa",
+      "rate_limited": "Comprovació en pausa",
+      "unavailable": "Comprovació no disponible",
+      "checking": "S'està comprovant…",
+      "issues": "{count, plural, =0 {Cap problema} one {# problema} other {# problemes}}"
+    },
+    "panel": {
+      "title": "Revisió",
+      "required": "Exigit per la vostra organització",
+      "check_message": "Revisa aquest missatge",
+      "notice": "Mentre escriviu, el text s'envia a {checkers} perquè el revisi. La vostra signatura i el missatge citat en queden fora. No s'envia res mentre un missatge estigui configurat per signar-se o xifrar-se; el que heu escrit abans d'activar-ho potser ja s'ha revisat.",
+      "turn_on": "Activa la revisió",
+      "paused_protected": "No es revisa res mentre aquest missatge estigui configurat per signar-se o xifrar-se.",
+      "paused_unknown": "{plugin} pot signar o xifrar missatges sense mostrar-ho aquí, així que no es revisa res mentre estigui activat.",
+      "rate_limited": "{checker} ha demanat esperar. La revisió es reprèn d'aquí a un minut.",
+      "unavailable": "{checker} no pot revisar ara mateix. Ho torna a provar quan continueu escrivint.",
+      "no_issues": "No s'ha trobat cap problema.",
+      "list_label": "Problemes en aquest missatge",
+      "shortcuts": "Problema següent: {next}. Anterior: {previous}."
+    },
+    "notice": {
+      "on": "La revisió està activada. Mentre escriviu, el text s'envia a {checkers} perquè el revisi, sense la vostra signatura ni el missatge citat. No s'envia res mentre un missatge estigui configurat per signar-se o xifrar-se; el que heu escrit abans potser ja s'ha revisat.",
+      "forced": "La vostra organització ha activat la revisió. Mentre escriviu, el text s'envia a {checkers} perquè el revisi, sense la vostra signatura ni el missatge citat. No s'envia res mentre un missatge estigui configurat per signar-se o xifrar-se; el que heu escrit abans potser ja s'ha revisat.",
+      "ok": "D'acord"
+    },
+    "send_warning": {
+      "title": "Voleu enviar-lo amb problemes pendents?",
+      "body": "{count, plural, one {Queda # error d'ortografia o de gramàtica} other {Queden # errors d'ortografia o de gramàtica}} per resoldre en aquest missatge.",
+      "review": "Revisa",
+      "send": "Envia igualment"
+    },
+    "settings": {
+      "title": "Revisió",
+      "description": "Subratlla els errors d'ortografia i de gramàtica mentre escriviu, amb suggeriments per corregir-los.",
+      "enable": "Revisa l'ortografia i la gramàtica mentre escric",
+      "enable_description": "El text que escriviu s'envia al complement de revisió i al servei que fa servir, sense la vostra signatura ni els missatges citats. No s'envia res mentre un missatge estigui configurat per signar-se o xifrar-se.",
+      "no_checker": "No hi ha cap complement de revisió instal·lat. Demaneu a l'administrador que n'afegeixi un.",
+      "plugin_description": "Envia el que escriviu a {plugin}.",
+      "writing_language": "Llengua d'escriptura",
+      "writing_language_description": "La llengua en què escriviu normalment. La fan servir la revisió i el corrector ortogràfic del navegador.",
+      "auto": "Detecta automàticament"
+    },
+    "shortcuts": {
+      "next_issue": "Error d'ortografia o de gramàtica següent",
+      "previous_issue": "Error d'ortografia o de gramàtica anterior"
     }
   }
 }
